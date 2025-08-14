@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análisis de Texto Griego</title>
+    <!-- Tailwind CSS para un estilo moderno y responsive -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f0e9;
+            color: #4a4a4a;
+        }
+        .textum-classicum {
+            font-family: 'Georgia', 'Times New Roman', serif;
+        }
+        .verbum {
+            cursor: pointer;
+            transition: background-color .2s ease-in-out, box-shadow .2s ease-in-out;
+            border-radius: 0.25rem;
+            padding: 0 0.1rem;
+        }
+        .verbum:hover {
+            background-color: #ede6d6;
+        }
+        .activus {
+            background-color: #cbbca7 !important;
+            font-weight: 700;
+        }
+        /* Layout responsive para móvil y escritorio */
+        .main-layout {
+            padding: 1rem;
+            padding-bottom: calc(45vh + 2rem);
+            min-height: 100vh;
+        }
+        #marginalia-sinistra {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            height: 45vh;
+            z-index: 50;
+            border-top: 2px solid #d6d3d1;
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.1);
+            transform: translateY(0);
+            transition: transform 0.3s ease-in-out;
+        }
+        @media (min-width: 1024px) {
+            .main-layout {
+                display: grid;
+                grid-template-columns: 22rem 1fr;
+                gap: 2rem;
+                padding: 2rem;
+                padding-bottom: 2rem;
+            }
+            #marginalia-sinistra {
+                position: sticky;
+                top: 2rem;
+                bottom: auto;
+                left: auto;
+                right: auto;
+                height: calc(100vh - 4rem);
+                width: auto;
+                border-top: none;
+                box-shadow: var(--tw-shadow-xl);
+            }
+        }
+    </style>
+</head>
+<body class="bg-stone-100">
+
+    <div class="main-layout">
+        <main>
+            <header class="text-center mb-10 border-b-2 border-stone-300 pb-5">
+                <h1 class="text-5xl textum-classicum text-gray-800">Elogio de la Mosca</h1>
+                <h2 class="text-2xl text-gray-600 mt-2">Texto de Eliano</h2>
+            </header>
+
+            <div id="paragrafus-contentus" class="textum-classicum text-xl leading-relaxed text-justify bg-white p-8 lg:p-12 rounded-lg shadow-lg"></div>
+
+            <footer class="text-center mt-6 text-sm text-gray-500">
+                <p><i>Haz clic en una palabra para ver su análisis y la traducción de la frase.</i></p>
+            </footer>
+        </main>
+
+        <aside id="marginalia-sinistra" class="bg-white p-6 rounded-t-lg lg:rounded-lg overflow-y-auto">
+            <div id="marginalia-contentus"></div>
+        </aside>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+        // =========================================================================================
+        // === ZONA DE DATOS ===
+        // === Rellena este objeto con el contenido del texto, traducciones y análisis ===
+        // =========================================================================================
+        const paragrafus = {
+            id: 8,
+            orationes: [
+                {
+                    id_orationis: 'o42',
+                    textus_latinus: "καὶ διὰ τοῦτο πᾶσι νῦν τοῖς κοιμωμένοις αὐτὴν τοῦ ὕπνου φθονεῖν μεμνημένην ἔτι τοῦ Ἐνδυμίωνος, καὶ μάλιστα τοῖς νέοις καὶ ἁπαλοῖς·",
+                    translationes: {
+                        es: '<strong>Traducción:</strong> Y por esta razón, (dice el mito que) ahora ella envidia el sueño de todos los que duermen, recordando aún a Endimión, y sobre todo el de los jóvenes y delicados.',
+                        zh: '<strong>翻譯:</strong> 因此，（神話說）她至今仍嫉妒所有沉睡者的睡眠，因為她還記得恩底彌翁，尤其是那些年輕而嬌嫩的人。'
+                    },
+                    verba: [
+                        { id_verbi: 'v42_1', terminus: 'καὶ', analysis_morphologicus: 'Conjunción. "y".', analysis_morphologicus_zh: '連接詞。「和」。', significationes: { es: 'y' } },
+                        { id_verbi: 'v42_2', terminus: 'διὰ', analysis_morphologicus: 'Preposición. "por".', analysis_morphologicus_zh: '介詞。「因為」。', significationes: { es: 'por' } },
+                        { id_verbi: 'v42_3', terminus: 'τοῦτο', analysis_morphologicus: 'Pronombre demostrativo, acusativo, neutro, singular. "esto".', analysis_morphologicus_zh: '指示代名詞，賓格，中性，單數。「這個」。', significationes: { es: 'esto' } },
+                        { id_verbi: 'v42_4', terminus: 'πᾶσι', analysis_morphologicus: 'Adjetivo, dativo, masculino, plural. "a todos".', analysis_morphologicus_zh: '形容詞，與格，陽性，複數。「對所有」。', significationes: { es: 'a todos' } },
+                        { id_verbi: 'v42_5', terminus: 'νῦν', analysis_morphologicus: 'Adverbio de tiempo. "ahora".', analysis_morphologicus_zh: '時間副詞。「現在」。', significationes: { es: 'ahora' } },
+                        { id_verbi: 'v42_6', terminus: 'τοῖς', analysis_morphologicus: 'Artículo, dativo, masculino, plural.', analysis_morphologicus_zh: '冠詞，與格，陽性，複數。', significationes: { es: 'los' } },
+                        { id_verbi: 'v42_7', terminus: 'κοιμωμένοις', analysis_morphologicus: 'Participio, presente, medio, dativo, masculino, plural. "los que duermen".', analysis_morphologicus_zh: '分詞，現在時，中間語態，與格，陽性，複數。「沉睡者」。', significationes: { es: 'que duermen' } },
+                        { id_verbi: 'v42_8', terminus: 'αὐτὴν', analysis_morphologicus: 'Pronombre, acusativo, femenino, singular. Sujeto de φθονεῖν.', analysis_morphologicus_zh: '代名詞，賓格，陰性，單數。φθονεῖν 的主語。', significationes: { es: 'ella' } },
+                        { id_verbi: 'v42_9', terminus: 'τοῦ', analysis_morphologicus: 'Artículo, genitivo, masculino, singular.', analysis_morphologicus_zh: '冠詞，屬格，陽性，單數。', significationes: { es: 'del' } },
+                        { id_verbi: 'v42_10', terminus: 'ὕπνου', analysis_morphologicus: 'Sustantivo, genitivo, masculino, singular. "sueño".', analysis_morphologicus_zh: '名詞，屬格，陽性，單數。「睡眠」。', significationes: { es: 'sueño' } },
+                        { id_verbi: 'v42_11', terminus: 'φθονεῖν', analysis_morphologicus: 'Verbo, presente, infinitivo, activo. De φθονέω, "envidiar".', analysis_morphologicus_zh: '動詞，現在時，不定式，主動語態。來自 φθονέω，「嫉妒」。', significationes: { es: 'envidiar' } },
+                        { id_verbi: 'v42_12', terminus: 'μεμνημένην', analysis_morphologicus: 'Participio, perfecto, medio, acusativo, femenino, singular. De μιμνῄσκω, "recordar".', analysis_morphologicus_zh: '分詞，完成時，中間語態，賓格，陰性，單數。來自 μιμνῄσκω，「記得」。', significationes: { es: 'recordando' } },
+                        { id_verbi: 'v42_13', terminus: 'ἔτι', analysis_morphologicus: 'Adverbio. "aún".', analysis_morphologicus_zh: '副詞。「仍然」。', significationes: { es: 'aún' } },
+                        { id_verbi: 'v42_14', terminus: 'τοῦ', analysis_morphologicus: 'Artículo, genitivo, masculino, singular.', analysis_morphologicus_zh: '冠詞，屬格，陽性，單數。', significationes: { es: 'a' } },
+                        { id_verbi: 'v42_15', terminus: 'Ἐνδυμίωνος', analysis_morphologicus: 'Sustantivo, genitivo, masculino, singular. "Endimión".', analysis_morphologicus_zh: '名詞，屬格，陽性，單數。「恩底彌翁」。', significationes: { es: 'Endimión' } },
+                        { id_verbi: 'v42_16', terminus: 'καὶ', analysis_morphologicus: 'Conjunción.', analysis_morphologicus_zh: '連接詞。', significationes: { es: 'y' } },
+                        { id_verbi: 'v42_17', terminus: 'μάλιστα', analysis_morphologicus: 'Adverbio superlativo. "especialmente".', analysis_morphologicus_zh: '最高級副詞。「尤其是」。', significationes: { es: 'sobre todo' } },
+                        { id_verbi: 'v42_18', terminus: 'τοῖς', analysis_morphologicus: 'Artículo, dativo, masculino, plural.', analysis_morphologicus_zh: '冠詞，與格，陽性，複數。', significationes: { es: 'los' } },
+                        { id_verbi: 'v42_19', terminus: 'νέοις', analysis_morphologicus: 'Adjetivo, dativo, masculino, plural. "jóvenes".', analysis_morphologicus_zh: '形容詞，與格，陽性，複數。「年輕的」。', significationes: { es: 'jóvenes' } },
+                        { id_verbi: 'v42_20', terminus: 'καὶ', analysis_morphologicus: 'Conjunción.', analysis_morphologicus_zh: '連接詞。', significationes: { es: 'y' } },
+                        { id_verbi: 'v42_21', terminus: 'ἁπαλοῖς', analysis_morphologicus: 'Adjetivo, dativo, masculino, plural. "delicados".', analysis_morphologicus_zh: '形容詞，與格，陽性，複數。「嬌嫩的」。', significationes: { es: 'delicados' } },
+                    ]
+                },
+                {
+                    id_orationis: 'o43',
+                    textus_latinus: "καὶ τὸ δῆγμα δὲ αὐτὸ καὶ ἡ τοῦ αἵματος ἐπιθυμία οὐκ ἀγριότητος, ἀλλ' ἔρωτός ἐστι σημεῖον καὶ φιλανθρωπίας·",
+                    translationes: {
+                        es: '<strong>Traducción:</strong> Y la picadura en sí misma, y el deseo de sangre, no es signo de salvajismo, sino de amor y de afecto por la humanidad.',
+                        zh: '<strong>翻譯:</strong> 叮咬本身，以及對血液的渴望，並非野性的標誌，而是愛與仁慈的象徵。'
+                    },
+                    verba: [
+                        { id_verbi: 'v43_1', terminus: 'καὶ', analysis_morphologicus: 'Conjunción. "y".', analysis_morphologicus_zh: '連接詞。「和」。', significationes: { es: 'y' } },
+                        { id_verbi: 'v43_2', terminus: 'τὸ', analysis_morphologicus: 'Artículo, nominativo, neutro, singular.', analysis_morphologicus_zh: '冠詞，主格，中性，單數。', significationes: { es: 'la' } },
+                        { id_verbi: 'v43_3', terminus: 'δῆγμα', analysis_morphologicus: 'Sustantivo, nominativo, neutro, singular. "picadura". Sujeto.', analysis_morphologicus_zh: '名詞，主格，中性，單數。「叮咬」。主語。', significationes: { es: 'picadura' } },
+                        { id_verbi: 'v43_4', terminus: 'δὲ', analysis_morphologicus: 'Conjunción adversativa.', analysis_morphologicus_zh: '反義連接詞。', significationes: { es: 'y' } },
+                        { id_verbi: 'v43_5', terminus: 'αὐτὸ', analysis_morphologicus: 'Pronombre, nominativo, neutro, singular. "en sí mismo".', analysis_morphologicus_zh: '代名詞，主格，中性，單數。「本身」。', significationes: { es: 'en sí mismo' } },
+                        { id_verbi: 'v43_6', terminus: 'καὶ', analysis_morphologicus: 'Conjunción.', analysis_morphologicus_zh: '連接詞。', significationes: { es: 'y' } },
+                        { id_verbi: 'v43_7', terminus: 'ἡ', analysis_morphologicus: 'Artículo, nominativo, femenino, singular.', analysis_morphologicus_zh: '冠詞，主格，陰性，單數。', significationes: { es: 'el' } },
+                        { id_verbi: 'v43_8', terminus: 'τοῦ', analysis_morphologicus: 'Artículo, genitivo, neutro, singular.', analysis_morphologicus_zh: '冠詞，屬格，中性，單數。', significationes: { es: 'de' } },
+                        { id_verbi: 'v43_9', terminus: 'αἵματος', analysis_morphologicus: 'Sustantivo, genitivo, neutro, singular. "sangre".', analysis_morphologicus_zh: '名詞，屬格，中性，單數。「血液」。', significationes: { es: 'sangre' } },
+                        { id_verbi: 'v43_10', terminus: 'ἐπιθυμία', analysis_morphologicus: 'Sustantivo, nominativo, femenino, singular. "deseo". Sujeto.', analysis_morphologicus_zh: '名詞，主格，陰性，單數。「渴望」。主語。', significationes: { es: 'deseo' } },
+                        { id_verbi: 'v43_11', terminus: 'οὐκ', analysis_morphologicus: 'Adverbio de negación.', analysis_morphologicus_zh: '否定副詞。', significationes: { es: 'no' } },
+                        { id_verbi: 'v43_12', terminus: 'ἀγριότητος', analysis_morphologicus: 'Sustantivo, genitivo, femenino, singular. "salvajismo". Genitivo predicativo.', analysis_morphologicus_zh: '名詞，屬格，陰性，單數。來自 ἀγριότης，「野性」。謂語屬格。', significationes: { es: 'salvajismo' } },
+                        { id_verbi: 'v43_13', terminus: "ἀλλ'", analysis_morphologicus: 'Conjunción adversativa.', analysis_morphologicus_zh: '反義連接詞。', significationes: { es: 'sino' } },
+                        { id_verbi: 'v43_14', terminus: 'ἔρωτός', analysis_morphologicus: 'Sustantivo, genitivo, masculino, singular. "amor". Genitivo predicativo.', analysis_morphologicus_zh: '名詞，屬格，陽性，單數。「愛」。謂語屬格。', significationes: { es: 'amor' } },
+                        { id_verbi: 'v43_15', terminus: 'ἐστι', analysis_morphologicus: 'Verbo, presente, indicativo, activo, 3ª persona, singular. "es".', analysis_morphologicus_zh: '動詞，現在時，直陳式，主動語態，第三人稱，單數。「是」。', significationes: { es: 'es' } },
+                        { id_verbi: 'v43_16', terminus: 'σημεῖον', analysis_morphologicus: 'Sustantivo, nominativo, neutro, singular. "signo". Predicado nominal.', analysis_morphologicus_zh: '名詞，主格，中性，單數。「標誌」。主格謂語。', significationes: { es: 'signo' } },
+                        { id_verbi: 'v43_17', terminus: 'καὶ', analysis_morphologicus: 'Conjunción.', analysis_morphologicus_zh: '連接詞。', significationes: { es: 'y' } },
+                        { id_verbi: 'v43_18', terminus: 'φιλανθρωπίας', analysis_morphologicus: 'Sustantivo, genitivo, femenino, singular. "afecto por la humanidad".', analysis_morphologicus_zh: '名詞，屬格，陰性，單數。來自 φιλανθρωπία，「仁慈」。', significationes: { es: 'afecto por la humanidad' } },
+                    ]
+                },
+                {
+                    id_orationis: 'o44',
+                    textus_latinus: "ὡς γὰρ δυνατὸν ἀπολαύει καὶ τοῦ κάλλους τι ἀπανθίζεται.",
+                    translationes: {
+                        es: '<strong>Traducción:</strong> Pues, en la medida de lo posible, disfruta de la belleza y recoge algo de su flor.',
+                        zh: '<strong>翻譯:</strong> 因為，牠盡其所能地享受著美麗，並摘取其精華。'
+                    },
+                    verba: [
+                        { id_verbi: 'v44_1', terminus: 'ὡς', analysis_morphologicus: 'Conjunción.', analysis_morphologicus_zh: '連接詞。', significationes: { es: 'como' } },
+                        { id_verbi: 'v44_2', terminus: 'γὰρ', analysis_morphologicus: 'Conjunción causal.', analysis_morphologicus_zh: '原因連接詞。', significationes: { es: 'pues' } },
+                        { id_verbi: 'v44_3', terminus: 'δυνατὸν', analysis_morphologicus: 'Adjetivo, nominativo, neutro, singular. "posible".', analysis_morphologicus_zh: '形容詞，主格，中性，單數。「可能」。', significationes: { es: 'posible' } },
+                        { id_verbi: 'v44_4', terminus: 'ἀπολαύει', analysis_morphologicus: 'Verbo, presente, indicativo, activo, 3ª persona, singular. Del verbo ἀπολαύω, "disfrutar de".', analysis_morphologicus_zh: '動詞，現在時，直陳式，主動語態，第三人稱，單數。來自 ἀπολαύω，「享受」。', significationes: { es: 'disfruta' } },
+                        { id_verbi: 'v44_5', terminus: 'καὶ', analysis_morphologicus: 'Conjunción.', analysis_morphologicus_zh: '連接詞。', significationes: { es: 'y' } },
+                        { id_verbi: 'v44_6', terminus: 'τοῦ', analysis_morphologicus: 'Artículo, genitivo, neutro, singular.', analysis_morphologicus_zh: '冠詞，屬格，中性，單數。', significationes: { es: 'la' } },
+                        { id_verbi: 'v44_7', terminus: 'κάλλους', analysis_morphologicus: 'Sustantivo, genitivo, neutro, singular. "belleza".', analysis_morphologicus_zh: '名詞，屬格，中性，單數。「美麗」。', significationes: { es: 'belleza' } },
+                        { id_verbi: 'v44_8', terminus: 'τι', analysis_morphologicus: 'Pronombre indefinido, acusativo, neutro, singular. "algo".', analysis_morphologicus_zh: '不定代名詞，賓格，中性，單數。「某物」。', significationes: { es: 'algo' } },
+                        { id_verbi: 'v44_9', terminus: 'ἀπανθίζεται', analysis_morphologicus: 'Verbo, presente, indicativo, medio, 3ª persona, singular. Del verbo ἀπανθίζομαι, "recoger la flor, cosechar para sí".', analysis_morphologicus_zh: '動詞，現在時，直陳式，中間語態，第三人稱，單數。來自 ἀπανθίζομαι，「摘取精華」。', significationes: { es: 'recoge algo' } },
+                    ]
+                },
+                {
+                    id_orationis: 'o45',
+                    textus_latinus: "Ἐγένετο κατὰ τοὺς παλαιοὺς καὶ γυνή τις ὁμώνυμος αὐτῇ, ποιήτρια, πάνυ καλὴ καὶ σοφή, καὶ ἄλλη ἑταίρα τῶν Ἀττικῶν ἐπιφανής, περὶ ἧς καὶ ὁ κωμικὸς ποιητὴς ἔφη, ἡ Μυῖα ἔδακνεν αὐτὸν ἄχρι τῆς καρδίας·",
+                    translationes: {
+                        es: '<strong>Traducción:</strong> También, según los antiguos, hubo una mujer del mismo nombre, poetisa, muy hermosa y sabia, y otra hetera de las Áticas, famosa, de la cual también el poeta cómico dijo: "Muia lo picaba hasta el corazón".',
+                        zh: '<strong>翻譯:</strong> 根據古人的說法，曾有一位與牠同名的女人，是一位女詩人，非常美麗和聰慧；還有另一位著名的雅典交際花，關於她，喜劇詩人也曾說：「穆伊亞叮咬他直到心底。」'
+                    },
+                    verba: [
+                        { id_verbi: 'v45_1', terminus: 'Ἐγένετο', analysis_morphologicus: 'Verbo, aoristo, indicativo, medio, 3ª persona, singular. Del verbo γίγνομαι, "hubo, llegó a ser".', analysis_morphologicus_zh: '動詞，不定過去時，直陳式，中間語態，第三人稱，單數。來自 γίγνομαι，「曾經有，成為」。', significationes: { es: 'Hubo' } },
+                        { id_verbi: 'v45_2', terminus: 'κατὰ', analysis_morphologicus: 'Preposición.', analysis_morphologicus_zh: '介詞。', significationes: { es: 'según' } },
+                        { id_verbi: 'v45_3', terminus: 'τοὺς', analysis_morphologicus: 'Artículo, acusativo, masculino, plural.', analysis_morphologicus_zh: '冠詞，賓格，陽性，複數。', significationes: { es: 'los' } },
+                        { id_verbi: 'v45_4', terminus: 'παλαιοὺς', analysis_morphologicus: 'Adjetivo, acusativo, masculino, plural. "antiguos".', analysis_morphologicus_zh: '形容詞，賓格，陽性，複數。「古老的」。', significationes: { es: 'antiguos' } },
+                        { id_verbi: 'v45_5', terminus: 'καὶ', analysis_morphologicus: 'Conjunción.', analysis_morphologicus_zh: '連接詞。', significationes: { es: 'y' } },
+                        { id_verbi: 'v45_6', terminus: 'γυνή', analysis_morphologicus: 'Sustantivo, nominativo, femenino, singular. "mujer". Sujeto.', analysis_morphologicus_zh: '名詞，主格，陰性，單數。「女人」。主語。', significationes: { es: 'mujer' } },
+                        { id_verbi: 'v45_7', terminus: 'τις', analysis_morphologicus: 'Pronombre indefinido, nominativo, femenino, singular. "una cierta".', analysis_morphologicus_zh: '不定代名詞，主格，陰性，單數。「某個」。', significationes: { es: 'una cierta' } },
+                        { id_verbi: 'v45_8', terminus: 'ὁμώνυμος', analysis_morphologicus: 'Adjetivo, nominativo, femenino, singular. "homónima".', analysis_morphologicus_zh: '形容詞，主格，陰性，單數。「同名的」。', significationes: { es: 'homónima' } },
+                        { id_verbi: 'v45_9', terminus: 'αὐτῇ', analysis_morphologicus: 'Pronombre, dativo, femenino, singular.', analysis_morphologicus_zh: '代名詞，與格，陰性，單數。', significationes: { es: 'de ella' } },
+                        { id_verbi: 'v45_10', terminus: 'ποιητρία', analysis_morphologicus: 'Sustantivo, nominativo, femenino, singular. "poetisa".', analysis_morphologicus_zh: '名詞，主格，陰性，單數。「女詩人」。', significationes: { es: 'poetisa' } },
+                        { id_verbi: 'v45_11', terminus: 'πάνυ', analysis_morphologicus: 'Adverbio. "muy".', analysis_morphologicus_zh: '副詞。「非常」。', significationes: { es: 'muy' } },
+                        { id_verbi: 'v45_12', terminus: 'καλὴ', analysis_morphologicus: 'Adjetivo, nominativo, femenino, singular. "hermosa".', analysis_morphologicus_zh: '形容詞，主格，陰性，單數。「美麗的」。', significationes: { es: 'hermosa' } },
+                        { id_verbi: 'v45_13', terminus: 'καὶ', analysis_morphologicus: 'Conjunción.', analysis_morphologicus_zh: '連接詞。', significationes: { es: 'y' } },
+                        { id_verbi: 'v45_14', terminus: 'σοφή', analysis_morphologicus: 'Adjetivo, nominativo, femenino, singular. "sabia".', analysis_morphologicus_zh: '形容詞，主格，陰性，單數。「聰慧的」。', significationes: { es: 'sabia' } },
+                        { id_verbi: 'v45_15', terminus: 'καὶ', analysis_morphologicus: 'Conjunción.', analysis_morphologicus_zh: '連接詞。', significationes: { es: 'y' } },
+                        { id_verbi: 'v45_16', terminus: 'ἄλλη', analysis_morphologicus: 'Adjetivo, nominativo, femenino, singular. "otra".', analysis_morphologicus_zh: '形容詞，主格，陰性，單數。「另一位」。', significationes: { es: 'otra' } },
+                        { id_verbi: 'v45_17', terminus: 'ἑταίρα', analysis_morphologicus: 'Sustantivo, nominativo, femenino, singular. "hetera".', analysis_morphologicus_zh: '名詞，主格，陰性，單數。「交際花」。', significationes: { es: 'hetera' } },
+                        { id_verbi: 'v45_18', terminus: 'τῶν', analysis_morphologicus: 'Artículo, genitivo, plural.', analysis_morphologicus_zh: '冠詞，屬格，複數。', significationes: { es: 'de las' } },
+                        { id_verbi: 'v45_19', terminus: 'Ἀττικῶν', analysis_morphologicus: 'Adjetivo, genitivo, femenino, plural. "Áticas".', analysis_morphologicus_zh: '形容詞，屬格，陰性，複數。「雅典的」。', significationes: { es: 'Áticas' } },
+                        { id_verbi: 'v45_20', terminus: 'ἐπιφανής', analysis_morphologicus: 'Adjetivo, nominativo, femenino, singular. "famosa".', analysis_morphologicus_zh: '形容詞，主格，陰性，單數。「著名的」。', significationes: { es: 'famosa' } },
+                        { id_verbi: 'v45_21', terminus: 'περὶ', analysis_morphologicus: 'Preposición. "acerca de".', analysis_morphologicus_zh: '介詞。「關於」。', significationes: { es: 'acerca de' } },
+                        { id_verbi: 'v45_22', terminus: 'ἧς', analysis_morphologicus: 'Pronombre relativo, genitivo, femenino, singular.', analysis_morphologicus_zh: '關係代名詞，屬格，陰性，單數。', significationes: { es: 'la cual' } },
+                        { id_verbi: 'v45_23', terminus: 'καὶ', analysis_morphologicus: 'Conjunción.', analysis_morphologicus_zh: '連接詞。', significationes: { es: 'también' } },
+                        { id_verbi: 'v45_24', terminus: 'ὁ', analysis_morphologicus: 'Artículo, nominativo, masculino, singular.', analysis_morphologicus_zh: '冠詞，主格，陽性，單數。', significationes: { es: 'el' } },
+                        { id_verbi: 'v45_25', terminus: 'κωμικὸς', analysis_morphologicus: 'Adjetivo, nominativo, masculino, singular. "cómico".', analysis_morphologicus_zh: '形容詞，主格，陽性，單數。「喜劇的」。', significationes: { es: 'cómico' } },
+                        { id_verbi: 'v45_26', terminus: 'ποιητὴς', analysis_morphologicus: 'Sustantivo, nominativo, masculino, singular. "poeta".', analysis_morphologicus_zh: '名詞，主格，陽性，單數。「詩人」。', significationes: { es: 'poeta' } },
+                        { id_verbi: 'v45_27', terminus: 'ἔφη', analysis_morphologicus: 'Verbo, imperfecto/aoristo, indicativo, activo, 3ª persona, singular. De φημί, "decir".', analysis_morphologicus_zh: '動詞，未完成時/不定過去時，直陳式，主動語態，第三人稱，單數。來自 φημί，「說」。', significationes: { es: 'dijo' } },
+                        { id_verbi: 'v45_28', terminus: 'ἡ', analysis_morphologicus: 'Artículo, nominativo, femenino, singular.', analysis_morphologicus_zh: '冠詞，主格，陰性，單數。', significationes: { es: 'la' } },
+                        { id_verbi: 'v45_29', terminus: 'Μυῖα', analysis_morphologicus: 'Nombre propio, nominativo, femenino, singular. "Muia".', analysis_morphologicus_zh: '專有名詞，主格，陰性，單數。「穆伊亞」。', significationes: { es: 'Muia' } },
+                        { id_verbi: 'v45_30', terminus: 'ἔδακνεν', analysis_morphologicus: 'Verbo, imperfecto, indicativo, activo, 3ª persona, singular. Del verbo δάκνω, "picar".', analysis_morphologicus_zh: '動詞，未完成時，直陳式，主動語態，第三人稱，單數。來自 δάκνω，「叮咬」。', significationes: { es: 'picaba' } },
+                        { id_verbi: 'v45_31', terminus: 'αὐτὸν', analysis_morphologicus: 'Pronombre, acusativo, masculino, singular. "él".', analysis_morphologicus_zh: '代名詞，賓格，陽性，單數。「他」。', significationes: { es: 'a él' } },
+                        { id_verbi: 'v45_32', terminus: 'ἄχρι', analysis_morphologicus: 'Preposición. "hasta".', analysis_morphologicus_zh: '介詞。「直到」。', significationes: { es: 'hasta' } },
+                        { id_verbi: 'v45_33', terminus: 'τῆς', analysis_morphologicus: 'Artículo, genitivo, femenino, singular.', analysis_morphologicus_zh: '冠詞，屬格，陰性，單數。', significationes: { es: 'el' } },
+                        { id_verbi: 'v45_34', terminus: 'καρδίας', analysis_morphologicus: 'Sustantivo, genitivo, femenino, singular. "corazón".', analysis_morphologicus_zh: '名詞，屬格，陰性，單數。「心」。', significationes: { es: 'corazón' } },
+                    ]
+                },
+                {
+                    id_orationis: 'o46',
+                    textus_latinus: "οὕτως οὐδὲ ἡ κωμικὴ χάρις ἀπηξίωσεν οὐδὲ ἀπέκλεισε τῆς σκηνῆς τὸ τῆς μυίας ὄνομα, οὐδ' οἱ γονεῖς ᾐδοῦντο τὰς θυγατέρας οὕτω καλοῦντες.",
+                    translationes: {
+                        es: '<strong>Traducción:</strong> De esta manera, ni siquiera la gracia cómica desdeñó ni excluyó del escenario el nombre de la mosca, ni los padres se avergonzaban de llamar así a sus hijas.',
+                        zh: '<strong>翻譯:</strong> 就這樣，連喜劇的魅力也不曾鄙棄或從舞台上排除蒼蠅的名字，父母們也從不羞於如此稱呼自己的女兒。'
+                    },
+                    verba: [
+                        { id_verbi: 'v46_1', terminus: 'οὕτως', analysis_morphologicus: 'Adverbio. "de esta manera".', analysis_morphologicus_zh: '副詞。「就這樣」。', significationes: { es: 'De esta manera' } },
+                        { id_verbi: 'v46_2', terminus: 'οὐδὲ', analysis_morphologicus: 'Conjunción + adverbio de negación. "ni siquiera".', analysis_morphologicus_zh: '連接詞 + 否定副詞。「甚至不」。', significationes: { es: 'ni siquiera' } },
+                        { id_verbi: 'v46_3', terminus: 'ἡ', analysis_morphologicus: 'Artículo, nominativo, femenino, singular.', analysis_morphologicus_zh: '冠詞，主格，陰性，單數。', significationes: { es: 'la' } },
+                        { id_verbi: 'v46_4', terminus: 'κωμικὴ', analysis_morphologicus: 'Adjetivo, nominativo, femenino, singular. "cómica".', analysis_morphologicus_zh: '形容詞，主格，陰性，單數。「喜劇的」。', significationes: { es: 'cómica' } },
+                        { id_verbi: 'v46_5', terminus: 'χάρις', analysis_morphologicus: 'Sustantivo, nominativo, femenino, singular. "gracia".', analysis_morphologicus_zh: '名詞，主格，陰性，單數。「魅力」。', significationes: { es: 'gracia' } },
+                        { id_verbi: 'v46_6', terminus: 'ἀπηξίωσεν', analysis_morphologicus: 'Verbo, aoristo, indicativo, activo, 3ª persona, singular. De ἀπαξιόω, "desdeñar".', analysis_morphologicus_zh: '動詞，不定過去時，直陳式，主動語態，第三人稱，單數。來自 ἀπαξιόω，「鄙棄」。', significationes: { es: 'desdeñó' } },
+                        { id_verbi: 'v46_7', terminus: 'οὐδὲ', analysis_morphologicus: 'Conjunción + adverbio de negación. "ni".', analysis_morphologicus_zh: '連接詞 + 否定副詞。「也不」。', significationes: { es: 'ni' } },
+                        { id_verbi: 'v46_8', terminus: 'ἀπέκλεισε', analysis_morphologicus: 'Verbo, aoristo, indicativo, activo, 3ª persona, singular. Del verbo ἀποκλείω, "excluir".', analysis_morphologicus_zh: '動詞，不定過去時，直陳式，主動語態，第三人稱，單數。來自 ἀποκλείω，「排除」。', significationes: { es: 'excluyó' } },
+                        { id_verbi: 'v46_9', terminus: 'τῆς', analysis_morphologicus: 'Artículo, genitivo, femenino, singular.', analysis_morphologicus_zh: '冠詞，屬格，陰性，單數。', significationes: { es: 'del' } },
+                        { id_verbi: 'v46_10', terminus: 'σκηνῆς', analysis_morphologicus: 'Sustantivo, genitivo, femenino, singular. "escenario".', analysis_morphologicus_zh: '名詞，屬格，陰性，單數。「舞台」。', significationes: { es: 'escenario' } },
+                        { id_verbi: 'v46_11', terminus: 'τὸ', analysis_morphologicus: 'Artículo, acusativo, neutro, singular.', analysis_morphologicus_zh: '冠詞，賓格，中性，單數。', significationes: { es: 'el' } },
+                        { id_verbi: 'v46_12', terminus: 'τῆς', analysis_morphologicus: 'Artículo, genitivo, femenino, singular.', analysis_morphologicus_zh: '冠詞，屬格，陰性，單數。', significationes: { es: 'de la' } },
+                        { id_verbi: 'v46_13', terminus: 'μυίας', analysis_morphologicus: 'Sustantivo, genitivo, femenino, singular. "mosca".', analysis_morphologicus_zh: '名詞，屬格，陰性，單數。「蒼蠅」。', significationes: { es: 'mosca' } },
+                        { id_verbi: 'v46_14', terminus: 'ὄνομα', analysis_morphologicus: 'Sustantivo, acusativo, neutro, singular. "nombre".', analysis_morphologicus_zh: '名詞，賓格，中性，單數。「名字」。', significationes: { es: 'nombre' } },
+                        { id_verbi: 'v46_15', terminus: 'οὐδ\'', analysis_morphologicus: 'Conjunción + adverbio de negación. "ni".', analysis_morphologicus_zh: '連接詞 + 否定副詞。「也不」。', significationes: { es: 'ni' } },
+                        { id_verbi: 'v46_16', terminus: 'οἱ', analysis_morphologicus: 'Artículo, nominativo, masculino, plural.', analysis_morphologicus_zh: '冠詞，主格，陽性，複數。', significationes: { es: 'los' } },
+                        { id_verbi: 'v46_17', terminus: 'γονεῖς', analysis_morphologicus: 'Sustantivo, nominativo, masculino, plural. "padres".', analysis_morphologicus_zh: '名詞，主格，陽性，複數。「父母」。', significationes: { es: 'padres' } },
+                        { id_verbi: 'v46_18', terminus: 'ᾐδοῦντο', analysis_morphologicus: 'Verbo, imperfecto, indicativo, medio, 3ª persona, plural. De αἰδέομαι, "avergonzarse de".', analysis_morphologicus_zh: '動詞，未完成時，直陳式，中間語態，第三人稱，複數。來自 αἰδέομαι，「感到羞愧」。', significationes: { es: 'se avergonzaban' } },
+                        { id_verbi: 'v46_19', terminus: 'τὰς', analysis_morphologicus: 'Artículo, acusativo, femenino, plural.', analysis_morphologicus_zh: '冠詞，賓格，陰性，複數。', significationes: { es: 'a sus' } },
+                        { id_verbi: 'v46_20', terminus: 'θυγατέρας', analysis_morphologicus: 'Sustantivo, acusativo, femenino, plural. "hijas".', analysis_morphologicus_zh: '名詞，賓格，陰性，複數。「女兒」。', significationes: { es: 'hijas' } },
+                        { id_verbi: 'v46_21', terminus: 'οὕτω', analysis_morphologicus: 'Adverbio. "así".', analysis_morphologicus_zh: '副詞。「如此」。', significationes: { es: 'así' } },
+                        { id_verbi: 'v46_22', terminus: 'καλοῦντες', analysis_morphologicus: 'Participio, presente, activo, nominativo, masculino, plural. Del verbo καλέω, "llamar".', analysis_morphologicus_zh: '分詞，現在時，主動語態，主格，陽性，複數。來自 καλέω，「稱呼」。', significationes: { es: 'llamándolas' } },
+                    ]
+                },
+                {
+                    id_orationis: 'o47',
+                    textus_latinus: "ἡ μὲν γὰρ τραγῳδία καὶ σὺν μεγάλῳ ἐπαίνῳ μέμνηται τῆς μυίας, ὡς ἐν τούτοις,",
+                    translationes: {
+                        es: '<strong>Traducción:</strong> Pues la tragedia, con gran elogio, menciona a la mosca, como en estos versos:',
+                        zh: '<strong>翻譯:</strong> 因為悲劇以極大的讚譽提到了蒼蠅，就像在這幾句詩中一樣：'
+                    },
+                    verba: [
+                        { id_verbi: 'v47_1', terminus: 'ἡ', analysis_morphologicus: 'Artículo, nominativo, femenino, singular.', analysis_morphologicus_zh: '冠詞，主格，陰性，單數。', significationes: { es: 'la' } },
+                        { id_verbi: 'v47_2', terminus: 'μὲν', analysis_morphologicus: 'Partícula.', analysis_morphologicus_zh: '質詞。', significationes: { es: 'ciertamente' } },
+                        { id_verbi: 'v47_3', terminus: 'γὰρ', analysis_morphologicus: 'Conjunción causal.', analysis_morphologicus_zh: '原因連接詞。', significationes: { es: 'pues' } },
+                        { id_verbi: 'v47_4', terminus: 'τραγῳδία', analysis_morphologicus: 'Sustantivo, nominativo, femenino, singular. "tragedia". Sujeto.', analysis_morphologicus_zh: '名詞，主格，陰性，單數。「悲劇」。主語。', significationes: { es: 'tragedia' } },
+                        { id_verbi: 'v47_5', terminus: 'καὶ', analysis_morphologicus: 'Conjunción.', analysis_morphologicus_zh: '連接詞。', significationes: { es: 'y' } },
+                        { id_verbi: 'v47_6', terminus: 'σὺν', analysis_morphologicus: 'Preposición. "con".', analysis_morphologicus_zh: '介詞。「伴隨著」。', significationes: { es: 'con' } },
+                        { id_verbi: 'v47_7', terminus: 'μεγάλῳ', analysis_morphologicus: 'Adjetivo, dativo, masculino, singular. "gran".', analysis_morphologicus_zh: '形容詞，與格，陽性，單數。「巨大的」。', significationes: { es: 'gran' } },
+                        { id_verbi: 'v47_8', terminus: 'ἐπαίνῳ', analysis_morphologicus: 'Sustantivo, dativo, masculino, singular. "elogio".', analysis_morphologicus_zh: '名詞，與格，陽性，單數。「讚譽」。', significationes: { es: 'elogio' } },
+                        { id_verbi: 'v47_9', terminus: 'μέμνηται', analysis_morphologicus: 'Verbo, perfecto, indicativo, medio, 3ª persona, singular. Del verbo μιμνῄσκω, "mencionar".', analysis_morphologicus_zh: '動詞，完成時，直陳式，中間語態，第三人稱，單數。來自 μιμνῄσκω，「提及」。', significationes: { es: 'menciona' } },
+                        { id_verbi: 'v47_10', terminus: 'τῆς', analysis_morphologicus: 'Artículo, genitivo, femenino, singular.', analysis_morphologicus_zh: '冠詞，屬格，陰性，單數。', significationes: { es: 'a la' } },
+                        { id_verbi: 'v47_11', terminus: 'μυίας', analysis_morphologicus: 'Sustantivo, genitivo, femenino, singular. "mosca".', analysis_morphologicus_zh: '名詞，屬格，陰性，單數。「蒼蠅」。', significationes: { es: 'mosca' } },
+                        { id_verbi: 'v47_12', terminus: 'ὡς', analysis_morphologicus: 'Conjunción. "como".', analysis_morphologicus_zh: '連接詞。「像」。', significationes: { es: 'como' } },
+                        { id_verbi: 'v47_13', terminus: 'ἐν', analysis_morphologicus: 'Preposición. "en".', analysis_morphologicus_zh: '介詞。「在」。', significationes: { es: 'en' } },
+                        { id_verbi: 'v47_14', terminus: 'τούτοις', analysis_morphologicus: 'Pronombre demostrativo, dativo, neutro, plural. "estos".', analysis_morphologicus_zh: '指示代名詞，與格，中性，複數。「這些」。', significationes: { es: 'estos' } },
+                    ]
+                }
+            ]
+        };
+
+        // =========================================================================================
+        // === ZONA DE LÓGICA INTERACTIVA ===
+        // === No es necesario modificar el código debajo de esta línea ===
+        // =========================================================================================
+        const paragrafusContentus = document.getElementById('paragrafus-contentus');
+        const marginaliaContentus = document.getElementById('marginalia-contentus');
+
+        let activumVerbum = null;
+        let activaOratio = null;
+
+        /**
+         * Renderiza el texto griego en el panel principal, envolviendo cada palabra con un span clickeable.
+         */
+        function reddeParagrafum() {
+            let allText = paragrafus.orationes.map(o => o.textus_latinus).join(' ');
+            let allVerba = paragrafus.orationes.flatMap(o => o.verba.map(v => ({...v, oratioId: o.id_orationis})));
+            
+            // Crea un mapa de palabras para una búsqueda más rápida
+            const verbaMap = new Map(allVerba.map(v => [v.terminus, v]));
+
+            // Expresión regular para tokenizar el texto, separando palabras de puntuación y espacios
+            const tokens = allText.split(/([,.·:;])|(\s+)/).filter(Boolean);
+            
+            let htmlContentus = '';
+            tokens.forEach(token => {
+                // Limpia el token de cualquier carácter no deseado que pudiera haberse colado
+                const cleanToken = token.trim();
+
+                // Si el token es un espacio o un token de puntuación, lo añade sin procesar
+                if (!cleanToken) {
+                    htmlContentus += token;
+                } else {
+                    const verbumData = verbaMap.get(cleanToken);
+                    if (verbumData) {
+                        htmlContentus += `<span class="verbum" data-verbum-id="${verbumData.id_verbi}" data-oratio-id="${verbumData.oratioId}">${cleanToken}</span>`;
+                    } else {
+                        htmlContentus += cleanToken;
+                    }
+                }
+            });
+
+            paragrafusContentus.innerHTML = htmlContentus;
+        }
+
+        /**
+         * Actualiza el contenido del panel lateral con el análisis de la palabra y la traducción de la frase.
+         */
+        function actualizaMarginalia() {
+            let htmlContentus = '';
+
+            // Sección de análisis morfológico
+            htmlContentus += `
+                <section id="analysis-morphologicus-section" class="mb-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">Análisis Morfológico / 形態分析</h3>`;
+            if (activumVerbum) {
+                htmlContentus += `
+                    <h4 class="text-2xl textum-classicum text-gray-800 mb-4">${activumVerbum.terminus}</h4>
+                    <div class="space-y-4">
+                        <div>
+                            <h5 class="font-bold text-sm uppercase text-gray-500 tracking-wider">Análisis (Español)</h5>
+                            <p class="text-gray-700 mt-1">${activumVerbum.analysis_morphologicus}</p>
+                            <p class="text-gray-700 mt-1"><strong>Significado:</strong> ${activumVerbum.significationes.es}</p>
+                        </div>
+                        <div>
+                            <h5 class="font-bold text-sm uppercase text-gray-500 tracking-wider mt-4">形態分析 (中文)</h5>
+                            <p class="text-gray-700 mt-1">${activumVerbum.analysis_morphologicus_zh}</p>
+                            <p class="text-gray-700 mt-1"><strong>意義:</strong> ${activumVerbum.significationes.zh || 'Traducción no disponible'}</p>
+                        </div>
+                    </div>`;
+            } else {
+                htmlContentus += `<div class="p-4 bg-stone-200 rounded-md text-gray-600"><p>Seleccione una palabra para ver su análisis.</p></div>`;
+            }
+            htmlContentus += `</section>`;
+
+            // Sección de traducción de la frase
+            if (activaOratio) {
+                htmlContentus += `
+                    <hr class="border-stone-300 my-6">
+                    <section id="analysis-orationis-section">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-4">Traducción de la Frase / 句子翻譯</h3>
+                        <div class="space-y-3">
+                             <p class="text-gray-800 textum-classicum bg-stone-200 p-3 rounded-md">${activaOratio.textus_latinus}</p>
+                             <div class="text-gray-700 mt-2">${activaOratio.translationes.es}</div>
+                             <div class="text-gray-700 mt-2">${activaOratio.translationes.zh}</div>
+                        </div>
+                    </section>`;
+            }
+
+            marginaliaContentus.innerHTML = htmlContentus;
+        }
+
+        /**
+         * Manejador de eventos para el clic en las palabras.
+         */
+        paragrafusContentus.addEventListener('click', (e) => {
+            const verbumTarget = e.target.closest('.verbum');
+
+            // Si se hace clic fuera de una palabra, deseleccionar
+            if (!verbumTarget) {
+                document.querySelectorAll('.activus').forEach(el => el.classList.remove('activus'));
+                activumVerbum = null;
+                activaOratio = null;
+                actualizaMarginalia();
+                return;
+            }
+
+            // Remover la clase 'activus' de cualquier palabra previamente seleccionada
+            document.querySelectorAll('.activus').forEach(el => el.classList.remove('activus'));
+
+            const verbumId = verbumTarget.dataset.verbumId;
+            const oratioId = verbumTarget.dataset.oratioId;
+
+            // Encontrar la oración y la palabra correspondientes
+            activaOratio = paragrafus.orationes.find(o => o.id_orationis === oratioId);
+            if (activaOratio) {
+                activumVerbum = activaOratio.verba.find(v => v.id_verbi === verbumId);
+            }
+
+            // Marcar la palabra seleccionada como activa
+            verbumTarget.classList.add('activus');
+
+            // Actualizar el panel lateral con la nueva información
+            actualizaMarginalia();
+        });
+
+        // Inicializar la interfaz al cargar la página
+        reddeParagrafum();
+        actualizaMarginalia();
+    });
+    </script>
+</body>
+</html>
