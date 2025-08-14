@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Índice de Proyectos - Textos Clásicos</title>
+    <!-- Incluimos Tailwind CSS para un diseño rápido y moderno -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Usamos una fuente más clásica para los títulos */
+        @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap');
+        
+        body {
+            background-color: #f3f0e9; /* Un fondo sutil y elegante */
+        }
+        .font-classic {
+            font-family: 'Merriweather', serif;
+        }
+    </style>
+</head>
+<body class="bg-stone-100 flex items-center justify-center min-h-screen p-4">
+
+    <div class="w-full max-w-3xl mx-auto">
+        
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-classic text-gray-800">Índice de Textos Analizados</h1>
+            <p class="text-lg text-gray-600 mt-2">Una colección de análisis interactivos de textos clásicos.</p>
+        </header>
+
+        <main class="bg-white rounded-xl shadow-xl p-6 md:p-10">
+            
+            <h2 class="text-2xl font-classic text-gray-700 border-b-2 border-stone-200 pb-3 mb-6">Luciano de Samósata</h2>
+            
+            <!-- LISTA DE ENLACES -->
+            <!-- Aquí es donde añadirás las nuevas páginas. -->
+            <!-- Solo tienes que copiar uno de los bloques <li>...</li> y modificar el enlace y el texto. -->
+            <ul class="space-y-4">
+                
+                <!-- ENLACE 1: Elogio de la Mosca - Parte I -->
+                <li>
+                    <a href="paginas/ElogiummoscaeI.html" 
+                       class="block p-5 bg-stone-50 hover:bg-stone-200 rounded-lg transition-all duration-300 ease-in-out hover:shadow-md transform hover:-translate-y-1">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="font-bold text-xl text-stone-800">Elogio de la Mosca (ΜΥΙΑΣ ΕΓΚΩΜΙΟΝ) - Parte I</h3>
+                                <p class="text-stone-600 mt-1">Análisis del primer fragmento de la obra de Luciano.</p>
+                            </div>
+                            <span class="text-2xl text-stone-400 transform -rotate-45 transition-transform duration-300 group-hover:rotate-0">→</span>
+                        </div>
+                    </a>
+                </li>
+                
+                <!-- ENLACE 2: Elogio de la Mosca - Parte II -->
+                <!-- Este es un ejemplo de cómo añadirías la siguiente página. -->
+                <!-- Asegúrate de que el archivo 'ElogiummoscaeII.html' exista en la carpeta 'paginas'. -->
+                <li>
+                    <a href="paginas/ElogiummoscaeII.html" 
+                       class="block p-5 bg-stone-50 hover:bg-stone-200 rounded-lg transition-all duration-300 ease-in-out hover:shadow-md transform hover:-translate-y-1">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="font-bold text-xl text-stone-800">Elogio de la Mosca (ΜΥΙΑΣ ΕΓΚΩΜΙΟΝ) - Parte II</h3>
+                                <p class="text-stone-600 mt-1">Análisis del segundo fragmento.</p>
+                            </div>
+                            <span class="text-2xl text-stone-400 transform -rotate-45 transition-transform duration-300 group-hover:rotate-0">→</span>
+                        </div>
+                    </a>
+                </li>
+
+                <!-- ¡AÑADE AQUÍ TUS NUEVOS ENLACES! -->
+
+            </ul>
+
+        </main>
+
+        <footer class="text-center mt-10">
+            <p class="text-sm text-gray-500">Proyecto desarrollado para el estudio de lenguas clásicas.</p>
+        </footer>
+
+    </div>
+
+</body>
+</html>
