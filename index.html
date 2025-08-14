@@ -12,15 +12,24 @@
         
         body {
             background-color: #f3f0e9; /* Un fondo sutil y elegante */
+            scroll-behavior: smooth; /* Para un desplazamiento suave */
         }
         .font-classic {
             font-family: 'Merriweather', serif;
         }
+        
+        /* Estilos para el visor de contenido */
+        #content-viewer iframe {
+            width: 100%;
+            height: 80vh; /* Altura del 80% de la ventana de visualización */
+            border: 1px solid #d6d3d1; /* Equivalente a border-stone-300 */
+            border-radius: 0.5rem; /* Equivalente a rounded-lg */
+        }
     </style>
 </head>
-<body class="bg-stone-100 flex items-center justify-center min-h-screen p-4">
+<body class="bg-stone-100 p-4">
 
-    <div class="w-full max-w-3xl mx-auto">
+    <div class="w-full max-w-5xl mx-auto">
         
         <header class="text-center mb-12">
             <h1 class="text-4xl md:text-5xl font-classic text-gray-800">Índice de Textos Analizados</h1>
@@ -31,52 +40,156 @@
             
             <h2 class="text-2xl font-classic text-gray-700 border-b-2 border-stone-200 pb-3 mb-6">Luciano de Samósata</h2>
             
-            <!-- LISTA DE ENLACES -->
-            <!-- Aquí es donde añadirás las nuevas páginas. -->
-            <!-- Solo tienes que copiar uno de los bloques <li>...</li> y modificar el enlace y el texto. -->
+            <!-- LISTA DE ENLACES ORDENADA CORRECTAMENTE -->
             <ul class="space-y-4">
                 
-                <!-- ENLACE 1: Elogio de la Mosca - Parte I -->
+                <!-- ENLACE 1 -->
                 <li>
-                    <a href="paginas/ElogiummoscaeI.html" 
-                       class="block p-5 bg-stone-50 hover:bg-stone-200 rounded-lg transition-all duration-300 ease-in-out hover:shadow-md transform hover:-translate-y-1">
+                    <a href="paginas/I.html" class="content-link block p-5 bg-stone-50 hover:bg-stone-200 rounded-lg transition-all duration-300 ease-in-out hover:shadow-md transform hover:-translate-y-1 cursor-pointer">
                         <div class="flex items-center justify-between">
-                            <div>
-                                <h3 class="font-bold text-xl text-stone-800">Elogio de la Mosca (ΜΥΙΑΣ ΕΓΚΩΜΙΟΝ) - Parte I</h3>
-                                <p class="text-stone-600 mt-1">Análisis del primer fragmento de la obra de Luciano.</p>
-                            </div>
-                            <span class="text-2xl text-stone-400 transform -rotate-45 transition-transform duration-300 group-hover:rotate-0">→</span>
+                            <div><h3 class="font-bold text-xl text-stone-800">Elogio de la Mosca - Parte I</h3></div>
+                            <span class="text-2xl text-stone-400">⊕</span>
                         </div>
                     </a>
                 </li>
                 
-                <!-- ENLACE 2: Elogio de la Mosca - Parte II -->
-                <!-- Este es un ejemplo de cómo añadirías la siguiente página. -->
-                <!-- Asegúrate de que el archivo 'ElogiummoscaeII.html' exista en la carpeta 'paginas'. -->
+                <!-- ENLACE 2 -->
                 <li>
-                    <a href="paginas/ElogiummoscaeII.html" 
-                       class="block p-5 bg-stone-50 hover:bg-stone-200 rounded-lg transition-all duration-300 ease-in-out hover:shadow-md transform hover:-translate-y-1">
+                    <a href="paginas/II.html" class="content-link block p-5 bg-stone-50 hover:bg-stone-200 rounded-lg transition-all duration-300 ease-in-out hover:shadow-md transform hover:-translate-y-1 cursor-pointer">
                         <div class="flex items-center justify-between">
-                            <div>
-                                <h3 class="font-bold text-xl text-stone-800">Elogio de la Mosca (ΜΥΙΑΣ ΕΓΚΩΜΙΟΝ) - Parte II</h3>
-                                <p class="text-stone-600 mt-1">Análisis del segundo fragmento.</p>
-                            </div>
-                            <span class="text-2xl text-stone-400 transform -rotate-45 transition-transform duration-300 group-hover:rotate-0">→</span>
+                            <div><h3 class="font-bold text-xl text-stone-800">Elogio de la Mosca - Parte II</h3></div>
+                            <span class="text-2xl text-stone-400">⊕</span>
                         </div>
                     </a>
                 </li>
 
-                <!-- ¡AÑADE AQUÍ TUS NUEVOS ENLACES! -->
+                <!-- ENLACE 3 -->
+                <li>
+                    <a href="paginas/III.html" class="content-link block p-5 bg-stone-50 hover:bg-stone-200 rounded-lg transition-all duration-300 ease-in-out hover:shadow-md transform hover:-translate-y-1 cursor-pointer">
+                        <div class="flex items-center justify-between">
+                            <div><h3 class="font-bold text-xl text-stone-800">Elogio de la Mosca - Parte III</h3></div>
+                            <span class="text-2xl text-stone-400">⊕</span>
+                        </div>
+                    </a>
+                </li>
+
+                <!-- ENLACE 4 -->
+                <li>
+                    <a href="paginas/IV.html" class="content-link block p-5 bg-stone-50 hover:bg-stone-200 rounded-lg transition-all duration-300 ease-in-out hover:shadow-md transform hover:-translate-y-1 cursor-pointer">
+                        <div class="flex items-center justify-between">
+                            <div><h3 class="font-bold text-xl text-stone-800">Elogio de la Mosca - Parte IV</h3></div>
+                            <span class="text-2xl text-stone-400">⊕</span>
+                        </div>
+                    </a>
+                </li>
+
+                <!-- ENLACE 5 -->
+                <li>
+                    <a href="paginas/V.html" class="content-link block p-5 bg-stone-50 hover:bg-stone-200 rounded-lg transition-all duration-300 ease-in-out hover:shadow-md transform hover:-translate-y-1 cursor-pointer">
+                        <div class="flex items-center justify-between">
+                            <div><h3 class="font-bold text-xl text-stone-800">Elogio de la Mosca - Parte V</h3></div>
+                            <span class="text-2xl text-stone-400">⊕</span>
+                        </div>
+                    </a>
+                </li>
+
+                <!-- ENLACE 6 -->
+                <li>
+                    <a href="paginas/VI.html" class="content-link block p-5 bg-stone-50 hover:bg-stone-200 rounded-lg transition-all duration-300 ease-in-out hover:shadow-md transform hover:-translate-y-1 cursor-pointer">
+                        <div class="flex items-center justify-between">
+                            <div><h3 class="font-bold text-xl text-stone-800">Elogio de la Mosca - Parte VI</h3></div>
+                            <span class="text-2xl text-stone-400">⊕</span>
+                        </div>
+                    </a>
+                </li>
+
+                <!-- ENLACE 7 -->
+                <li>
+                    <a href="paginas/VII.html" class="content-link block p-5 bg-stone-50 hover:bg-stone-200 rounded-lg transition-all duration-300 ease-in-out hover:shadow-md transform hover:-translate-y-1 cursor-pointer">
+                        <div class="flex items-center justify-between">
+                            <div><h3 class="font-bold text-xl text-stone-800">Elogio de la Mosca - Parte VII</h3></div>
+                            <span class="text-2xl text-stone-400">⊕</span>
+                        </div>
+                    </a>
+                </li>
+
+                <!-- ENLACE 8 -->
+                <li>
+                    <a href="paginas/VIII.html" class="content-link block p-5 bg-stone-50 hover:bg-stone-200 rounded-lg transition-all duration-300 ease-in-out hover:shadow-md transform hover:-translate-y-1 cursor-pointer">
+                        <div class="flex items-center justify-between">
+                            <div><h3 class="font-bold text-xl text-stone-800">Elogio de la Mosca - Parte VIII</h3></div>
+                            <span class="text-2xl text-stone-400">⊕</span>
+                        </div>
+                    </a>
+                </li>
+
+                <!-- ENLACE 9 -->
+                <li>
+                    <a href="paginas/IX.html" class="content-link block p-5 bg-stone-50 hover:bg-stone-200 rounded-lg transition-all duration-300 ease-in-out hover:shadow-md transform hover:-translate-y-1 cursor-pointer">
+                        <div class="flex items-center justify-between">
+                            <div><h3 class="font-bold text-xl text-stone-800">Elogio de la Mosca - Parte IX</h3></div>
+                            <span class="text-2xl text-stone-400">⊕</span>
+                        </div>
+                    </a>
+                </li>
 
             </ul>
 
         </main>
 
-        <footer class="text-center mt-10">
+        <!-- NUEVO: Contenedor para mostrar el contenido de las páginas secundarias -->
+        <div id="content-viewer" class="mt-8 bg-white rounded-xl shadow-xl p-4 md:p-6 hidden">
+            <div class="flex justify-end mb-4">
+                <button id="close-viewer-btn" class="px-4 py-2 bg-stone-200 hover:bg-stone-300 rounded-lg font-semibold text-stone-700 transition">Cerrar Visor</button>
+            </div>
+            <div id="iframe-wrapper">
+                <!-- El iframe se insertará aquí dinámicamente con JavaScript -->
+            </div>
+        </div>
+
+        <footer class="text-center mt-10 py-6">
             <p class="text-sm text-gray-500">Proyecto desarrollado para el estudio de lenguas clásicas.</p>
         </footer>
 
     </div>
+
+    <!-- NUEVO: Script para manejar la carga de contenido -->
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Seleccionamos todos los elementos necesarios del DOM
+        const contentLinks = document.querySelectorAll('.content-link');
+        const contentViewer = document.getElementById('content-viewer');
+        const iframeWrapper = document.getElementById('iframe-wrapper');
+        const closeBtn = document.getElementById('close-viewer-btn');
+
+        // Añadimos un evento a cada enlace de la lista
+        contentLinks.forEach(link => {
+            link.addEventListener('click', (event) => {
+                // Prevenimos la navegación normal
+                event.preventDefault();
+                const url = link.getAttribute('href');
+                
+                // Creamos un iframe y lo insertamos en su contenedor
+                // El título es importante para la accesibilidad
+                iframeWrapper.innerHTML = `<iframe src="${url}" title="Visor de contenido del texto seleccionado"></iframe>`;
+                
+                // Mostramos el contenedor del visor
+                contentViewer.classList.remove('hidden');
+
+                // Hacemos que la página se desplace suavemente hasta el visor
+                contentViewer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        });
+
+        // Añadimos un evento al botón de cerrar
+        closeBtn.addEventListener('click', () => {
+            // Ocultamos el visor
+            contentViewer.classList.add('hidden');
+            // Vaciamos el contenido para detener cualquier proceso dentro del iframe
+            iframeWrapper.innerHTML = '';
+        });
+    });
+    </script>
 
 </body>
 </html>
