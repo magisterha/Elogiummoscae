@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análisis de Texto Griego</title>
+    <!-- Tailwind CSS para un estilo moderno y responsive -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f0e9;
+            color: #4a4a4a;
+        }
+        .textum-classicum {
+            font-family: 'Georgia', 'Times New Roman', serif;
+        }
+        .verbum {
+            cursor: pointer;
+            transition: background-color .2s ease-in-out, box-shadow .2s ease-in-out;
+            border-radius: 0.25rem;
+            padding: 0 0.1rem;
+        }
+        .verbum:hover {
+            background-color: #ede6d6;
+        }
+        .activus {
+            background-color: #cbbca7 !important;
+            font-weight: 700;
+        }
+        /* Layout responsive para móvil y escritorio */
+        .main-layout {
+            padding: 1rem;
+            padding-bottom: calc(45vh + 2rem);
+            min-height: 100vh;
+        }
+        #marginalia-sinistra {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            height: 45vh;
+            z-index: 50;
+            border-top: 2px solid #d6d3d1;
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.1);
+            transform: translateY(0);
+            transition: transform 0.3s ease-in-out;
+        }
+        @media (min-width: 1024px) {
+            .main-layout {
+                display: grid;
+                grid-template-columns: 22rem 1fr;
+                gap: 2rem;
+                padding: 2rem;
+                padding-bottom: 2rem;
+            }
+            #marginalia-sinistra {
+                position: sticky;
+                top: 2rem;
+                bottom: auto;
+                left: auto;
+                right: auto;
+                height: calc(100vh - 4rem);
+                width: auto;
+                border-top: none;
+                box-shadow: var(--tw-shadow-xl);
+            }
+        }
+    </style>
+</head>
+<body class="bg-stone-100">
+
+    <div class="main-layout">
+        <main>
+            <header class="text-center mb-10 border-b-2 border-stone-300 pb-5">
+                <h1 class="text-5xl textum-classicum text-gray-800">Texto de Eliano (Continuación)</h1>
+                <h2 class="text-2xl text-gray-600 mt-2">Sobre la mosca</h2>
+            </header>
+
+            <div id="paragrafus-contentus" class="textum-classicum text-xl leading-relaxed text-justify bg-white p-8 lg:p-12 rounded-lg shadow-lg"></div>
+
+            <footer class="text-center mt-6 text-sm text-gray-500">
+                <p><i>Haz clic en una palabra para ver su análisis y la traducción de la frase.</i></p>
+            </footer>
+        </main>
+
+        <aside id="marginalia-sinistra" class="bg-white p-6 rounded-t-lg lg:rounded-lg overflow-y-auto">
+            <div id="marginalia-contentus"></div>
+        </aside>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+        // =========================================================================================
+        // === ZONA DE DATOS ===
+        // === Rellena este objeto con el contenido del texto, traducciones y análisis ===
+        // =========================================================================================
+        const paragrafus = {
+            id: 2,
+            orationes: [
+                {
+                    id_orationis: 'o5',
+                    textus_latinus: "καὶ μὴν κἀκεῖνο πρόσεστιν αὐτῇ, τὸ μὴ καθ' ἡσυχίαν, ἀλλὰ μετ' ᾠδῆς πέτεσθαι οὐκ ἀπηνοῦς οἵα κωνώπων καὶ ἐμπίδων, οὐδὲ τὸ βαρύβρομον τῶν μελιττῶν ἢ τῶν σφηκῶν τὸ φοβερὸν καὶ ἀπειλητικὸν ἐνδεικνυμένης, ἀλλὰ τοσοῦτόν ἐστι λιγυρωτέρα, ὅσον σάλπιγγος καὶ κυμβάλων αὐλοὶ μελιχρότεροι.",
+                    translationes: {
+                        es: '<strong>Traducción:</strong> Y, además, se le añade esto, el no volar en silencio, sino con un canto que no es desagradable como el de los jejenes y mosquitos, ni mostrando el fuerte zumbido de las abejas o el temible y amenazador de las avispas, sino que es tan armonioso como las flautas son más dulces que la trompeta y los címbalos.',
+                        zh: '<strong>翻譯:</strong> 此外，牠還有一個特點：牠並非靜靜地飛翔，而是伴隨著歌聲，這歌聲不像蚊蠓那樣刺耳，也不像蜜蜂那樣發出沉重的嗡嗡聲，或像黃蜂那樣顯得可怕和威脅，而是如此和諧，就像笛聲比號角和鐃鈸聲更甜美一樣。'
+                    },
+                    verba: [
+                        { id_verbi: 'v5_1', terminus: 'καὶ', analysis_morphologicus: 'Conjunción.', analysis_morphologicus_zh: '連接詞。', significationes: { es: 'Y' } },
+                        { id_verbi: 'v5_2', terminus: 'μὴν', analysis_morphologicus: 'Partícula.', analysis_morphologicus_zh: '強調質詞。', significationes: { es: 'ciertamente' } },
+                        { id_verbi: 'v5_3', terminus: 'κἀκεῖνο', analysis_morphologicus: 'Conjunción + Pronombre. De καὶ + ἐκεῖνο.', analysis_morphologicus_zh: '連接詞 + 代名詞。來自 καὶ + ἐκεῖνο。', significationes: { es: 'y aquello' } },
+                        { id_verbi: 'v5_4', terminus: 'πρόσεστιν', analysis_morphologicus: 'Verbo, presente, indicativo, activo, 3ª persona, singular. Del verbo πρόσειμι, "añadirse".', analysis_morphologicus_zh: '動詞，現在時，直陳式，主動語態，第三人稱，單數。來自於動詞 πρόσειμι，「附加」。', significationes: { es: 'se le añade' } },
+                        { id_verbi: 'v5_5', terminus: 'αὐτῇ', analysis_morphologicus: 'Pronombre, dativo, femenino, singular.', analysis_morphologicus_zh: '代名詞，與格，陰性，單數。', significationes: { es: 'a ella' } },
+                        { id_verbi: 'v5_6', terminus: 'τὸ', analysis_morphologicus: 'Artículo, neutro, singular.', analysis_morphologicus_zh: '冠詞，中性，單數。', significationes: { es: 'el' } },
+                        { id_verbi: 'v5_7', terminus: 'μὴ', analysis_morphologicus: 'Adverbio de negación. Niega el infinitivo.', analysis_morphologicus_zh: '否定副詞。否定不定式。', significationes: { es: 'no' } },
+                        { id_verbi: 'v5_8', terminus: "καθ'", analysis_morphologicus: 'Preposición. "en".', analysis_morphologicus_zh: '介詞。「在...」。', significationes: { es: 'en' } },
+                        { id_verbi: 'v5_9', terminus: 'ἡσυχίαν', analysis_morphologicus: 'Sustantivo, acusativo, femenino, singular. De ἡσυχία, "silencio".', analysis_morphologicus_zh: '名詞，賓格，陰性，單數。來自 ἡσυχία，「安靜」。', significationes: { es: 'silencio' } },
+                        { id_verbi: 'v5_10', terminus: 'ἀλλὰ', analysis_morphologicus: 'Conjunción adversativa. "sino".', analysis_morphologicus_zh: '反義連接詞。「而是」。', significationes: { es: 'sino' } },
+                        { id_verbi: 'v5_11', terminus: "μετ'", analysis_morphologicus: 'Preposición. "con".', analysis_morphologicus_zh: '介詞。「伴隨」。', significationes: { es: 'con' } },
+                        { id_verbi: 'v5_12', terminus: 'ᾠδῆς', analysis_morphologicus: 'Sustantivo, genitivo, femenino, singular. De ᾠδή, "canto".', analysis_morphologicus_zh: '名詞，屬格，陰性，單數。來自 ᾠδή，「歌聲」。', significationes: { es: 'un canto' } },
+                        { id_verbi: 'v5_13', terminus: 'πέτεσθαι', analysis_morphologicus: 'Verbo, presente, infinitivo, medio. Del verbo πέτομαι, "volar".', analysis_morphologicus_zh: '動詞，現在時，不定式，中間語態。來自於動詞 πέτομαι，「飛翔」。', significationes: { es: 'volar' } },
+                        { id_verbi: 'v5_14', terminus: 'οὐκ', analysis_morphologicus: 'Adverbio de negación. Niega el adjetivo.', analysis_morphologicus_zh: '否定副詞。否定形容詞。', significationes: { es: 'no' } },
+                        { id_verbi: 'v5_15', terminus: 'ἀπηνοῦς', analysis_morphologicus: 'Adjetivo, genitivo, femenino, singular. Del adjetivo ἀπηνής, "duro, desagradable".', analysis_morphologicus_zh: '形容詞，屬格，陰性，單數。來自形容詞 ἀπηνής，「刺耳的，令人不快的」。', significationes: { es: 'desagradable' } },
+                        { id_verbi: 'v5_16', terminus: 'οἵα', analysis_morphologicus: 'Adverbio comparativo. "como".', analysis_morphologicus_zh: '比較副詞。「像」。', significationes: { es: 'como' } },
+                        { id_verbi: 'v5_17', terminus: 'κωνώπων', analysis_morphologicus: 'Sustantivo, genitivo, masculino, plural. Del sustantivo κώνωψ, "jején, mosquito".', analysis_morphologicus_zh: '名詞，屬格，陽性，複數。來自名詞 κώνωψ，「蠓，蚊子」。', significationes: { es: 'de jejenes' } },
+                        { id_verbi: 'v5_18', terminus: 'καὶ', analysis_morphologicus: 'Conjunción copulativa. "y".', analysis_morphologicus_zh: '連接詞。「和」。', significationes: { es: 'y' } },
+                        { id_verbi: 'v5_19', terminus: 'ἐμπίδων', analysis_morphologicus: 'Sustantivo, genitivo, femenino, plural. Del sustantivo ἐμπίς, "mosquito".', analysis_morphologicus_zh: '名詞，屬格，陰性，複數。來自名詞 ἐμπίς，「蚊子」。', significationes: { es: 'de mosquitos' } },
+                        { id_verbi: 'v5_20', terminus: 'οὐδὲ', analysis_morphologicus: 'Conjunción. "ni".', analysis_morphologicus_zh: '連接詞。「也不」。', significationes: { es: 'ni' } },
+                        { id_verbi: 'v5_21', terminus: 'τὸ', analysis_morphologicus: 'Artículo, acusativo, neutro, singular.', analysis_morphologicus_zh: '冠詞，賓格，中性，單數。', significationes: { es: 'el' } },
+                        { id_verbi: 'v5_22', terminus: 'βαρύβρομον', analysis_morphologicus: 'Adjetivo, acusativo, neutro, singular. De βαρύβρομος, "de fuerte zumbido".', analysis_morphologicus_zh: '形容詞，賓格，中性，單數。來自 βαρύβρομος，「發出沉重嗡嗡聲的」。', significationes: { es: 'fuerte zumbido' } },
+                        { id_verbi: 'v5_23', terminus: 'τῶν', analysis_morphologicus: 'Artículo, genitivo, plural.', analysis_morphologicus_zh: '冠詞，屬格，複數。', significationes: { es: 'de las' } },
+                        { id_verbi: 'v5_24', terminus: 'μελιττῶν', analysis_morphologicus: 'Sustantivo, genitivo, femenino, plural. Del sustantivo μέλιττα, "abeja".', analysis_morphologicus_zh: '名詞，屬格，陰性，複數。來自名詞 μέλιττα，「蜜蜂」。', significationes: { es: 'abejas' } },
+                        { id_verbi: 'v5_25', terminus: 'ἢ', analysis_morphologicus: 'Conjunción disyuntiva. "o".', analysis_morphologicus_zh: '選擇連接詞。「或」。', significationes: { es: 'o' } },
+                        { id_verbi: 'v5_26', terminus: 'τῶν', analysis_morphologicus: 'Artículo, genitivo, plural.', analysis_morphologicus_zh: '冠詞，屬格，複數。', significationes: { es: 'de las' } },
+                        { id_verbi: 'v5_27', terminus: 'σφηκῶν', analysis_morphologicus: 'Sustantivo, genitivo, masculino, plural. Del sustantivo σφήξ, "avispa".', analysis_morphologicus_zh: '名詞，屬格，陽性，複數。來自名詞 σφήξ，「黃蜂」。', significationes: { es: 'avispas' } },
+                        { id_verbi: 'v5_28', terminus: 'τὸ', analysis_morphologicus: 'Artículo, acusativo, neutro, singular.', analysis_morphologicus_zh: '冠詞，賓格，中性，單數。', significationes: { es: 'el' } },
+                        { id_verbi: 'v5_29', terminus: 'φοβερὸν', analysis_morphologicus: 'Adjetivo, acusativo, neutro, singular. Del adjetivo φοβερός, "temible".', analysis_morphologicus_zh: '形容詞，賓格，中性，單數。來自形容詞 φοβερός，「可怕的」。', significationes: { es: 'temible' } },
+                        { id_verbi: 'v5_30', terminus: 'καὶ', analysis_morphologicus: 'Conjunción copulativa.', analysis_morphologicus_zh: '連接詞。', significationes: { es: 'y' } },
+                        { id_verbi: 'v5_31', terminus: 'ἀπειλητικὸν', analysis_morphologicus: 'Adjetivo, acusativo, neutro, singular. De ἀπειλητικός, "amenazador".', analysis_morphologicus_zh: '形容詞，賓格，中性，單數。來自 ἀπειλητικός，「威脅的」。', significationes: { es: 'amenazador' } },
+                        { id_verbi: 'v5_32', terminus: 'ἐνδεικνυμένης', analysis_morphologicus: 'Participio, presente, genitivo, femenino, singular. Del verbo ἐνδείκνυμι, "mostrar".', analysis_morphologicus_zh: '分詞，現在時，屬格，陰性，單數。來自於動詞 ἐνδείκνυμι，「顯示」。', significationes: { es: 'mostrando' } },
+                        { id_verbi: 'v5_33', terminus: 'ἀλλὰ', analysis_morphologicus: 'Conjunción adversativa. "sino".', analysis_morphologicus_zh: '反義連接詞。「而是」。', significationes: { es: 'sino' } },
+                        { id_verbi: 'v5_34', terminus: 'τοσοῦτόν', analysis_morphologicus: 'Adverbio de cantidad. "tan".', analysis_morphologicus_zh: '數量副詞。「如此之多」。', significationes: { es: 'tan' } },
+                        { id_verbi: 'v5_35', terminus: 'ἐστι', analysis_morphologicus: 'Verbo, presente, indicativo, activo, 3ª persona, singular. Del verbo εἰμί, "ser".', analysis_morphologicus_zh: '動詞，現在時，直陳式，主動語態，第三人稱，單數。來自於動詞 εἰμί，「是」。', significationes: { es: 'es' } },
+                        { id_verbi: 'v5_36', terminus: 'λιγυρωτέρα', analysis_morphologicus: 'Adjetivo comparativo, nominativo, femenino, singular. De λιγυρός, "claro, armonioso".', analysis_morphologicus_zh: '形容詞，比較級，主格，陰性，單數。來自 λιγυρός，「清晰的，和諧的」。', significationes: { es: 'más armoniosa' } },
+                        { id_verbi: 'v5_37', terminus: 'ὅσον', analysis_morphologicus: 'Adverbio comparativo. "como".', analysis_morphologicus_zh: '比較副詞。「多少」。', significationes: { es: 'como' } },
+                        { id_verbi: 'v5_38', terminus: 'σάλπιγγος', analysis_morphologicus: 'Sustantivo, genitivo, femenino, singular. Del sustantivo σάλπιγξ, "trompeta".', analysis_morphologicus_zh: '名詞，屬格，陰性，單數。來自名詞 σάλπιγξ，「號角」。', significationes: { es: 'trompeta' } },
+                        { id_verbi: 'v5_39', terminus: 'καὶ', analysis_morphologicus: 'Conjunción copulativa.', analysis_morphologicus_zh: '連接詞。', significationes: { es: 'y' } },
+                        { id_verbi: 'v5_40', terminus: 'κυμβάλων', analysis_morphologicus: 'Sustantivo, genitivo, neutro, plural. Del sustantivo κύμβαλον, "címbalo".', analysis_morphologicus_zh: '名詞，屬格，中性，複數。來自名詞 κύμβαλον，「鐃鈸」。', significationes: { es: 'címbalos' } },
+                        { id_verbi: 'v5_41', terminus: 'αὐλοὶ', analysis_morphologicus: 'Sustantivo, nominativo, masculino, plural. Del sustantivo αὐλός, "flauta".', analysis_morphologicus_zh: '名詞，主格，陽性，複數。來自名詞 αὐλός，「笛子」。', significationes: { es: 'las flautas' } },
+                        { id_verbi: 'v5_42', terminus: 'μελιχρότεροι', analysis_morphologicus: 'Adjetivo comparativo, nominativo, masculino, plural. De μελίχροος, "de color de miel, dulce".', analysis_morphologicus_zh: '形容詞，比較級，主格，陽性，複數。來自 μελίχροος，「蜜色的，甜美的」。', significationes: { es: 'más dulces' } },
+                    ]
+                },
+                {
+                    id_orationis: 'o6',
+                    textus_latinus: "τὸ δὲ ἄλλο σῶμα ἡ μὲν κεφαλὴ λεπτότατα τῷ αὐχένι συνέχεται καὶ ἔστιν εὐπεριάγωγος, οὐ συμπεφυκυῖα ὡς ἡ τῶν ἀκρίδων·",
+                    translationes: {
+                        es: '<strong>Traducción:</strong> Y la otra parte del cuerpo, la cabeza, está unida al cuello de forma muy fina y es fácilmente movible, no unida como la de las langostas.',
+                        zh: '<strong>翻譯:</strong> 身體的其餘部分，頭部，以非常纖細的方式與頸部相連，並且易於轉動，不像蝗蟲的頭那樣是固定的。'
+                    },
+                    verba: [
+                        { id_verbi: 'v6_1', terminus: 'τὸ', analysis_morphologicus: 'Artículo, nominativo/acusativo, neutro, singular.', analysis_morphologicus_zh: '冠詞，主格/賓格，中性，單數。', significationes: { es: 'El' } },
+                        { id_verbi: 'v6_2', terminus: 'δὲ', analysis_morphologicus: 'Conjunción adversativa. "y, pero".', analysis_morphologicus_zh: '反義連接詞。「而且，但是」。', significationes: { es: 'y' } },
+                        { id_verbi: 'v6_3', terminus: 'ἄλλο', analysis_morphologicus: 'Adjetivo, nominativo/acusativo, neutro, singular. Del adjetivo ἄλλος, "otro".', analysis_morphologicus_zh: '形容詞，主格/賓格，中性，單數。來自形容詞 ἄλλος，「其他的」。', significationes: { es: 'otro' } },
+                        { id_verbi: 'v6_4', terminus: 'σῶμα', analysis_morphologicus: 'Sustantivo, nominativo/acusativo, neutro, singular. "cuerpo".', analysis_morphologicus_zh: '名詞，主格/賓格，中性，單數。「身體」。', significationes: { es: 'cuerpo' } },
+                        { id_verbi: 'v6_5', terminus: 'ἡ', analysis_morphologicus: 'Artículo, nominativo, femenino, singular.', analysis_morphologicus_zh: '冠詞，主格，陰性，單數。', significationes: { es: 'la' } },
+                        { id_verbi: 'v6_6', terminus: 'μὲν', analysis_morphologicus: 'Partícula.', analysis_morphologicus_zh: '質詞。', significationes: { es: 'ciertamente' } },
+                        { id_verbi: 'v6_7', terminus: 'κεφαλὴ', analysis_morphologicus: 'Sustantivo, nominativo, femenino, singular. "cabeza".', analysis_morphologicus_zh: '名詞，主格，陰性，單數。「頭部」。', significationes: { es: 'cabeza' } },
+                        { id_verbi: 'v6_8', terminus: 'λεπτότατα', analysis_morphologicus: 'Adverbio superlativo. "de forma muy fina".', analysis_morphologicus_zh: '最高級副詞。「以非常纖細的方式」。', significationes: { es: 'muy finamente' } },
+                        { id_verbi: 'v6_9', terminus: 'τῷ', analysis_morphologicus: 'Artículo, dativo, masculino/neutro, singular.', analysis_morphologicus_zh: '冠詞，與格，陽性/中性，單數。', significationes: { es: 'al' } },
+                        { id_verbi: 'v6_10', terminus: 'αὐχένι', analysis_morphologicus: 'Sustantivo, dativo, masculino, singular. Del sustantivo αὐχήν, "cuello".', analysis_morphologicus_zh: '名詞，與格，陽性，單數。來自名詞 αὐχήν，「頸部」。', significationes: { es: 'cuello' } },
+                        { id_verbi: 'v6_11', terminus: 'συνέχεται', analysis_morphologicus: 'Verbo, presente, indicativo, pasivo, 3ª persona, singular. Del verbo συνέχω, "unir".', analysis_morphologicus_zh: '動詞，現在時，直陳式，被動語態，第三人稱，單數。來自於動詞 συνέχω，「連接」。', significationes: { es: 'está unida' } },
+                        { id_verbi: 'v6_12', terminus: 'καὶ', analysis_morphologicus: 'Conjunción copulativa.', analysis_morphologicus_zh: '連接詞。', significationes: { es: 'y' } },
+                        { id_verbi: 'v6_13', terminus: 'ἔστιν', analysis_morphologicus: 'Verbo, presente, indicativo, activo, 3ª persona, singular. Del verbo εἰμί, "ser".', analysis_morphologicus_zh: '動詞，現在時，直陳式，主動語態，第三人稱，單數。來自於動詞 εἰμί，「是」。', significationes: { es: 'es' } },
+                        { id_verbi: 'v6_14', terminus: 'εὐπεριάγωγος', analysis_morphologicus: 'Adjetivo, nominativo, femenino, singular. "fácilmente movible".', analysis_morphologicus_zh: '形容詞，主格，陰性，單數。「易於轉動的」。', significationes: { es: 'fácilmente movible' } },
+                        { id_verbi: 'v6_15', terminus: 'οὐ', analysis_morphologicus: 'Adverbio de negación.', analysis_morphologicus_zh: '否定副詞。', significationes: { es: 'no' } },
+                        { id_verbi: 'v6_16', terminus: 'συμπεφυκυῖα', analysis_morphologicus: 'Participio, perfecto, nominativo, femenino, singular. Del verbo συμφύω, "estar unido".', analysis_morphologicus_zh: '分詞，完成時，主格，陰性，單數。來自於動詞 συμφύω，「固定生長在一起」。', significationes: { es: 'unida' } },
+                        { id_verbi: 'v6_17', terminus: 'ὡς', analysis_morphologicus: 'Conjunción comparativa. "como".', analysis_morphologicus_zh: '比較連接詞。「像」。', significationes: { es: 'como' } },
+                        { id_verbi: 'v6_18', terminus: 'ἡ', analysis_morphologicus: 'Artículo, nominativo, femenino, singular.', analysis_morphologicus_zh: '冠詞，主格，陰性，單數。', significationes: { es: 'la' } },
+                        { id_verbi: 'v6_19', terminus: 'τῶν', analysis_morphologicus: 'Artículo, genitivo, plural.', analysis_morphologicus_zh: '冠詞，屬格，複數。', significationes: { es: 'de las' } },
+                        { id_verbi: 'v6_20', terminus: 'ἀκρίδων', analysis_morphologicus: 'Sustantivo, genitivo, femenino, plural. De ἀκρίς, "langosta".', analysis_morphologicus_zh: '名詞，屬格，陰性，複數。來自名詞 ἀκρίς，「蝗蟲」。', significationes: { es: 'langostas' } },
+                    ]
+                },
+                {
+                    id_orationis: 'o7',
+                    textus_latinus: "ὀφθαλμοὶ δὲ προπετεῖς, πολὺ τοῦ κέρατος ἔχοντες·",
+                    translationes: {
+                        es: '<strong>Traducción:</strong> Y tiene ojos saltones, que tienen mucho de la antena.',
+                        zh: '<strong>翻譯:</strong> 牠的眼睛突出，且帶有許多角的特徵。'
+                    },
+                    verba: [
+                        { id_verbi: 'v7_1', terminus: 'ὀφθαλμοὶ', analysis_morphologicus: 'Sustantivo, nominativo, masculino, plural. Del sustantivo ὀφθαλμός, "ojo". Sujeto de la oración.', analysis_morphologicus_zh: '名詞，主格，陽性，複數。來自名詞 ὀφθαλμός，「眼睛」。句子的主語。', significationes: { es: 'ojos' } },
+                        { id_verbi: 'v7_2', terminus: 'δὲ', analysis_morphologicus: 'Conjunción adversativa. "y".', analysis_morphologicus_zh: '反義連接詞。「而且，但是」。', significationes: { es: 'y' } },
+                        { id_verbi: 'v7_3', terminus: 'προπετεῖς', analysis_morphologicus: 'Adjetivo, nominativo, masculino, plural. De προπετής, "saliente, saltones".', analysis_morphologicus_zh: '形容詞，主格，陽性，複數。來自 προπετής，「突出的」。', significationes: { es: 'saltones' } },
+                        { id_verbi: 'v7_4', terminus: 'πολὺ', analysis_morphologicus: 'Adverbio. "mucho".', analysis_morphologicus_zh: '副詞。「很多」。', significationes: { es: 'mucho' } },
+                        { id_verbi: 'v7_5', terminus: 'τοῦ', analysis_morphologicus: 'Artículo, genitivo, neutro, singular.', analysis_morphologicus_zh: '冠詞，屬格，中性，單數。', significationes: { es: 'del' } },
+                        { id_verbi: 'v7_6', terminus: 'κέρατος', analysis_morphologicus: 'Sustantivo, genitivo, neutro, singular. De κέρας, "cuerno, antena".', analysis_morphologicus_zh: '名詞，屬格，中性，單數。來自 κέρας，「角，觸角」。', significationes: { es: 'antena' } },
+                        { id_verbi: 'v7_7', terminus: 'ἔχοντες', analysis_morphologicus: 'Participio, presente, nominativo, masculino, plural. Del verbo ἔχω, "tener". Concuerda con ὀφθαλμοί.', analysis_morphologicus_zh: '分詞，現在時，主格，陽性，複數。來自於動詞 ἔχω，「擁有」。與 ὀφθαλμοί 一致。', significationes: { es: 'teniendo' } },
+                    ]
+                },
+                {
+                    id_orationis: 'o8',
+                    textus_latinus: "στέρνον εὐπαγές, καὶ ἐμπεφύκασιν αὐτῇ τῇ ἐντομῇ οἱ πόδες οὐ κατὰ τοὺς σφῆκας πάνυ ἐσφιγμένῃ.",
+                    translationes: {
+                        es: '<strong>Traducción:</strong> El pecho es compacto, y los pies le han crecido en la incisión, no muy apretados como en las avispas.',
+                        zh: '<strong>翻譯:</strong> 胸部緊實，腳長在身體的切口處，不像黃蜂那樣緊緊地束縛著。'
+                    },
+                    verba: [
+                        { id_verbi: 'v8_1', terminus: 'στέρνον', analysis_morphologicus: 'Sustantivo, nominativo, neutro, singular. "pecho".', analysis_morphologicus_zh: '名詞，主格，中性，單數。「胸部」。', significationes: { es: 'pecho' } },
+                        { id_verbi: 'v8_2', terminus: 'εὐπαγές', analysis_morphologicus: 'Adjetivo, nominativo, neutro, singular. De εὐπαγής, "compacto".', analysis_morphologicus_zh: '形容詞，主格，中性，單數。來自 εὐπαγής，「緊實的」。', significationes: { es: 'compacto' } },
+                        { id_verbi: 'v8_3', terminus: 'καὶ', analysis_morphologicus: 'Conjunción copulativa. "y".', analysis_morphologicus_zh: '連接詞。「和」。', significationes: { es: 'y' } },
+                        { id_verbi: 'v8_4', terminus: 'ἐμπεφύκασιν', analysis_morphologicus: 'Verbo, perfecto, indicativo, activo, 3ª persona, plural. Del verbo ἐμφύομαι, "crecer en".', analysis_morphologicus_zh: '動詞，完成時，直陳式，主動語態，第三人稱，複數。來自於動詞 ἐμφύομαι，「長在...上」。', significationes: { es: 'han crecido' } },
+                        { id_verbi: 'v8_5', terminus: 'αὐτῇ', analysis_morphologicus: 'Pronombre, dativo, femenino, singular.', analysis_morphologicus_zh: '代名詞，與格，陰性，單數。', significationes: { es: 'le' } },
+                        { id_verbi: 'v8_6', terminus: 'τῇ', analysis_morphologicus: 'Artículo, dativo, femenino, singular.', analysis_morphologicus_zh: '冠詞，與格，陰性，單數。', significationes: { es: 'en la' } },
+                        { id_verbi: 'v8_7', terminus: 'ἐντομῇ', analysis_morphologicus: 'Sustantivo, dativo, femenino, singular. De ἐντομή, "incisión".', analysis_morphologicus_zh: '名詞，與格，陰性，單數。來自 ἐντομή，「切口」。', significationes: { es: 'incisión' } },
+                        { id_verbi: 'v8_8', terminus: 'οἱ', analysis_morphologicus: 'Artículo, nominativo, masculino, plural.', analysis_morphologicus_zh: '冠詞，主格，陽性，複數。', significationes: { es: 'los' } },
+                        { id_verbi: 'v8_9', terminus: 'πόδες', analysis_morphologicus: 'Sustantivo, nominativo, masculino, plural. "pies".', analysis_morphologicus_zh: '名詞，主格，陽性，複數。「腳」。', significationes: { es: 'pies' } },
+                        { id_verbi: 'v8_10', terminus: 'οὐ', analysis_morphologicus: 'Adverbio de negación.', analysis_morphologicus_zh: '否定副詞。', significationes: { es: 'no' } },
+                        { id_verbi: 'v8_11', terminus: 'κατὰ', analysis_morphologicus: 'Preposición. "como".', analysis_morphologicus_zh: '介詞。「像」。', significationes: { es: 'como' } },
+                        { id_verbi: 'v8_12', terminus: 'τοὺς', analysis_morphologicus: 'Artículo, acusativo, masculino, plural.', analysis_morphologicus_zh: '冠詞，賓格，陽性，複數。', significationes: { es: 'los' } },
+                        { id_verbi: 'v8_13', terminus: 'σφῆκας', analysis_morphologicus: 'Sustantivo, acusativo, masculino, plural. De σφήξ, "avispa".', analysis_morphologicus_zh: '名詞，賓格，陽性，複數。來自名詞 σφήξ，「黃蜂」。', significationes: { es: 'avispas' } },
+                        { id_verbi: 'v8_14', terminus: 'πάνυ', analysis_morphologicus: 'Adverbio. "muy".', analysis_morphologicus_zh: '副詞。「非常」。', significationes: { es: 'muy' } },
+                        { id_verbi: 'v8_15', terminus: 'ἐσφιγμένῃ', analysis_morphologicus: 'Participio, perfecto, dativo, femenino, singular. Del verbo σφίγγω, "apretar".', analysis_morphologicus_zh: '分詞，完成時，與格，陰性，單數。來自於動詞 σφίγγω，「束緊」。', significationes: { es: 'apretados' } },
+                    ]
+                },
+                {
+                    id_orationis: 'o9',
+                    textus_latinus: "ἡ γαστὴρ δὲ ὠχύρωται καὶ αὐτῇ καὶ θώρακι ἔοικεν ζώνας πλατείας καὶ φολίδας ἔχουσα.",
+                    translationes: {
+                        es: '<strong>Traducción:</strong> El abdomen está fortificado también, y es como un peto, teniendo anchas franjas y escamas.',
+                        zh: '<strong>翻譯:</strong> 腹部也同樣堅固，像一個胸甲，有著寬闊的條紋和鱗片。'
+                    },
+                    verba: [
+                        { id_verbi: 'v9_1', terminus: 'ἡ', analysis_morphologicus: 'Artículo, nominativo, femenino, singular.', analysis_morphologicus_zh: '冠詞，主格，陰性，單數。', significationes: { es: 'El' } },
+                        { id_verbi: 'v9_2', terminus: 'γαστὴρ', analysis_morphologicus: 'Sustantivo, nominativo, femenino, singular. "abdomen".', analysis_morphologicus_zh: '名詞，主格，陰性，單數。「腹部」。', significationes: { es: 'abdomen' } },
+                        { id_verbi: 'v9_3', terminus: 'δὲ', analysis_morphologicus: 'Conjunción adversativa.', analysis_morphologicus_zh: '反義連接詞。', significationes: { es: 'y' } },
+                        { id_verbi: 'v9_4', terminus: 'ὠχύρωται', analysis_morphologicus: 'Verbo, perfecto, indicativo, pasivo, 3ª persona, singular. Del verbo ὀχυρόω, "fortificar".', analysis_morphologicus_zh: '動詞，完成時，直陳式，被動語態，第三人稱，單數。來自於動詞 ὀχυρόω，「加固」。', significationes: { es: 'está fortificado' } },
+                        { id_verbi: 'v9_5', terminus: 'καὶ', analysis_morphologicus: 'Conjunción copulativa. "y".', analysis_morphologicus_zh: '連接詞。「和」。', significationes: { es: 'y' } },
+                        { id_verbi: 'v9_6', terminus: 'αὐτῇ', analysis_morphologicus: 'Pronombre, dativo, femenino, singular.', analysis_morphologicus_zh: '代名詞，與格，陰性，單數。', significationes: { es: 'a sí misma' } },
+                        { id_verbi: 'v9_7', terminus: 'καὶ', analysis_morphologicus: 'Conjunción copulativa. "y".', analysis_morphologicus_zh: '連接詞。「和」。', significationes: { es: 'y' } },
+                        { id_verbi: 'v9_8', terminus: 'θώρακι', analysis_morphologicus: 'Sustantivo, dativo, masculino, singular. Del sustantivo θώραξ, "peto".', analysis_morphologicus_zh: '名詞，與格，陽性，單數。來自名詞 θώραξ，「胸甲」。', significationes: { es: 'peto' } },
+                        { id_verbi: 'v9_9', terminus: 'ἔοικεν', analysis_morphologicus: 'Verbo, perfecto, indicativo, activo, 3ª persona, singular. Del verbo ἔοικα, "ser semejante a".', analysis_morphologicus_zh: '動詞，完成時，直陳式，主動語態，第三人稱，單數。來自於動詞 ἔοικα，「相似於」。', significationes: { es: 'es como' } },
+                        { id_verbi: 'v9_10', terminus: 'ζώνας', analysis_morphologicus: 'Sustantivo, acusativo, femenino, plural. "franjas".', analysis_morphologicus_zh: '名詞，賓格，陰性，複數。「條紋」。', significationes: { es: 'franjas' } },
+                        { id_verbi: 'v9_11', terminus: 'πλατείας', analysis_morphologicus: 'Adjetivo, acusativo, femenino, plural. "anchas".', analysis_morphologicus_zh: '形容詞，賓格，陰性，複數。「寬闊的」。', significationes: { es: 'anchas' } },
+                        { id_verbi: 'v9_12', terminus: 'καὶ', analysis_morphologicus: 'Conjunción copulativa.', analysis_morphologicus_zh: '連接詞。', significationes: { es: 'y' } },
+                        { id_verbi: 'v9_13', terminus: 'φολίδας', analysis_morphologicus: 'Sustantivo, acusativo, femenino, plural. De φολίς, "escama".', analysis_morphologicus_zh: '名詞，賓格，陰性，複數。來自 φολίς，「鱗片」。', significationes: { es: 'escamas' } },
+                        { id_verbi: 'v9_14', terminus: 'ἔχουσα', analysis_morphologicus: 'Participio, presente, nominativo, femenino, singular. Del verbo ἔχω, "tener".', analysis_morphologicus_zh: '分詞，現在時，主格，陰性，單數。來自於動詞 ἔχω，「擁有」。', significationes: { es: 'teniendo' } },
+                    ]
+                },
+                {
+                    id_orationis: 'o10',
+                    textus_latinus: "ἀμύνεται μέντοι οὐ κατὰ τουρροπύγιον ὡς σφὴξ καὶ μέλιττα, ἀλλὰ τῷ στόματι καὶ τῇ προβοσκίδι, ἣν κατὰ τὰ αὐτὰ τοῖς ἐλέφασι καὶ αὐτὴ ἔχουσα προνομεύει τε καὶ ἐπιλαμβάνεται καὶ προσφῦσα κατέχει κοτυληδόνι κατὰ τὸ ἄκρον ἐοικυῖαν.",
+                    translationes: {
+                        es: '<strong>Traducción:</strong> Sin embargo, se defiende no con la cola como una avispa y una abeja, sino con la boca y la probóscide, que ella misma, teniéndola de la misma manera que los elefantes, la usa para alimentarse, agarrar y, aferrada, sujetar con una ventosa que es semejante a un cápulo en la punta.',
+                        zh: '<strong>翻譯:</strong> 然而，牠不像黃蜂和蜜蜂那樣用尾部的刺來防禦，而是用嘴和長鼻。牠擁有像大象一樣的長鼻，用來覓食、抓取，並緊緊吸附，用頂端類似吸盤的東西固定住。'
+                    },
+                    verba: [
+                        { id_verbi: 'v10_1', terminus: 'ἀμύνεται', analysis_morphologicus: 'Verbo, presente, indicativo, medio, 3ª persona, singular. Del verbo ἀμύνω, "defenderse".', analysis_morphologicus_zh: '動詞，現在時，直陳式，中間語態，第三人稱，單數。來自於動詞 ἀμύνω，「防禦」。', significationes: { es: 'se defiende' } },
+                        { id_verbi: 'v10_2', terminus: 'μέντοι', analysis_morphologicus: 'Partícula. "sin embargo".', analysis_morphologicus_zh: '質詞。「然而」。', significationes: { es: 'sin embargo' } },
+                        { id_verbi: 'v10_3', terminus: 'οὐ', analysis_morphologicus: 'Adverbio de negación.', analysis_morphologicus_zh: '否定副詞。', significationes: { es: 'no' } },
+                        { id_verbi: 'v10_4', terminus: 'κατὰ', analysis_morphologicus: 'Preposición. "con".', analysis_morphologicus_zh: '介詞。「用」。', significationes: { es: 'con' } },
+                        { id_verbi: 'v10_5', terminus: 'τουρροπύγιον', analysis_morphologicus: 'Sustantivo, acusativo, neutro, singular. Del sustantivo οὐρροπύγιον, "aguijón".', analysis_morphologicus_zh: '名詞，賓格，中性，單數。來自名詞 οὐρροπύγιον，「尾刺」。', significationes: { es: 'la cola' } },
+                        { id_verbi: 'v10_6', terminus: 'ὡς', analysis_morphologicus: 'Conjunción. "como".', analysis_morphologicus_zh: '連接詞。「像」。', significationes: { es: 'como' } },
+                        { id_verbi: 'v10_7', terminus: 'σφὴξ', analysis_morphologicus: 'Sustantivo, nominativo, masculino, singular. "avispa".', analysis_morphologicus_zh: '名詞，主格，陽性，單數。「黃蜂」。', significationes: { es: 'una avispa' } },
+                        { id_verbi: 'v10_8', terminus: 'καὶ', analysis_morphologicus: 'Conjunción.', analysis_morphologicus_zh: '連接詞。', significationes: { es: 'y' } },
+                        { id_verbi: 'v10_9', terminus: 'μέλιττα', analysis_morphologicus: 'Sustantivo, nominativo, femenino, singular. "abeja".', analysis_morphologicus_zh: '名詞，主格，陰性，單數。「蜜蜂」。', significationes: { es: 'una abeja' } },
+                        { id_verbi: 'v10_10', terminus: 'ἀλλὰ', analysis_morphologicus: 'Conjunción adversativa.', analysis_morphologicus_zh: '反義連接詞。「而是」。', significationes: { es: 'sino' } },
+                        { id_verbi: 'v10_11', terminus: 'τῷ', analysis_morphologicus: 'Artículo, dativo, masculino/neutro, singular.', analysis_morphologicus_zh: '冠詞，與格，陽性/中性，單數。', significationes: { es: 'con la' } },
+                        { id_verbi: 'v10_12', terminus: 'στόματι', analysis_morphologicus: 'Sustantivo, dativo, neutro, singular. Del sustantivo στόμα, "boca".', analysis_morphologicus_zh: '名詞，與格，中性，單數。來自名詞 στόμα，「嘴」。', significationes: { es: 'boca' } },
+                        { id_verbi: 'v10_13', terminus: 'καὶ', analysis_morphologicus: 'Conjunción.', analysis_morphologicus_zh: '連接詞。', significationes: { es: 'y' } },
+                        { id_verbi: 'v10_14', terminus: 'τῇ', analysis_morphologicus: 'Artículo, dativo, femenino, singular.', analysis_morphologicus_zh: '冠詞，與格，陰性，單數。', significationes: { es: 'la' } },
+                        { id_verbi: 'v10_15', terminus: 'προβοσκίδι', analysis_morphologicus: 'Sustantivo, dativo, femenino, singular. Del sustantivo προβοσκίς, "probóscide".', analysis_morphologicus_zh: '名詞，與格，陰性，單數。來自名詞 προβοσκίς，「長鼻」。', significationes: { es: 'probóscide' } },
+                        { id_verbi: 'v10_16', terminus: 'ἣν', analysis_morphologicus: 'Pronombre relativo, acusativo, femenino, singular. Del pronombre ὅς, "que, cual".', analysis_morphologicus_zh: '關係代名詞，賓格，陰性，單數。來自 ὅς，「那個，哪個」。', significationes: { es: 'la cual' } },
+                        { id_verbi: 'v10_17', terminus: 'κατὰ', analysis_morphologicus: 'Preposición.', analysis_morphologicus_zh: '介詞。', significationes: { es: 'como' } },
+                        { id_verbi: 'v10_18', terminus: 'τὰ', analysis_morphologicus: 'Artículo, acusativo, neutro, plural.', analysis_morphologicus_zh: '冠詞，賓格，中性，複數。', significationes: { es: 'las' } },
+                        { id_verbi: 'v10_19', terminus: 'αὐτὰ', analysis_morphologicus: 'Adjetivo pronominal, acusativo, neutro, plural. "lo mismo".', analysis_morphologicus_zh: '代名詞形容詞，賓格，中性，複數。「相同的事物」。', significationes: { es: 'mismas cosas' } },
+                        { id_verbi: 'v10_20', terminus: 'τοῖς', analysis_morphologicus: 'Artículo, dativo, plural.', analysis_morphologicus_zh: '冠詞，與格，複數。', significationes: { es: 'a los' } },
+                        { id_verbi: 'v10_21', terminus: 'ἐλέφασι', analysis_morphologicus: 'Sustantivo, dativo, masculino, plural. Del sustantivo ἐλέφας, "elefante".', analysis_morphologicus_zh: '名詞，與格，陽性，複數。來自名詞 ἐλέφας，「大象」。', significationes: { es: 'elefantes' } },
+                        { id_verbi: 'v10_22', terminus: 'καὶ', analysis_morphologicus: 'Conjunción.', analysis_morphologicus_zh: '連接詞。', significationes: { es: 'y' } },
+                        { id_verbi: 'v10_23', terminus: 'αὐτὴ', analysis_morphologicus: 'Pronombre intensivo, nominativo, femenino, singular.', analysis_morphologicus_zh: '強調代名詞，主格，陰性，單數。', significationes: { es: 'ella misma' } },
+                        { id_verbi: 'v10_24', terminus: 'ἔχουσα', analysis_morphologicus: 'Participio, presente, nominativo, femenino, singular. Del verbo ἔχω, "tener".', analysis_morphologicus_zh: '分詞，現在時，主格，陰性，單數。來自於動詞 ἔχω，「擁有」。', significationes: { es: 'teniendo' } },
+                        { id_verbi: 'v10_25', terminus: 'προνομεύει', analysis_morphologicus: 'Verbo, presente, indicativo, activo, 3ª persona, singular. Del verbo προνομεύω, "alimentarse".', analysis_morphologicus_zh: '動詞，現在時，直陳式，主動語態，第三人稱，單數。來自於動詞 προνομεύω，「覓食」。', significationes: { es: 'se alimenta' } },
+                        { id_verbi: 'v10_26', terminus: 'τε', analysis_morphologicus: 'Partícula enclítica. "y".', analysis_morphologicus_zh: '附著詞。「和」。', significationes: { es: 'y' } },
+                        { id_verbi: 'v10_27', terminus: 'καὶ', analysis_morphologicus: 'Conjunción.', analysis_morphologicus_zh: '連接詞。', significationes: { es: 'y' } },
+                        { id_verbi: 'v10_28', terminus: 'ἐπιλαμβάνεται', analysis_morphologicus: 'Verbo, presente, indicativo, medio, 3ª persona, singular. Del verbo ἐπιλαμβάνομαι, "agarrar".', analysis_morphologicus_zh: '動詞，現在時，直陳式，中間語態，第三人稱，單數。來自於動詞 ἐπιλαμβάνομαι，「抓住」。', significationes: { es: 'agarra' } },
+                        { id_verbi: 'v10_29', terminus: 'καὶ', analysis_morphologicus: 'Conjunción.', analysis_morphologicus_zh: '連接詞。', significationes: { es: 'y' } },
+                        { id_verbi: 'v10_30', terminus: 'προσφῦσα', analysis_morphologicus: 'Participio, aoristo, nominativo, femenino, singular. Del verbo προσφύομαι, "aferrarse".', analysis_morphologicus_zh: '分詞，不定過去時，主格，陰性，單數。來自於動詞 προσφύομαι，「附著」。', significationes: { es: 'aferrada' } },
+                        { id_verbi: 'v10_31', terminus: 'κατέχει', analysis_morphologicus: 'Verbo, presente, indicativo, activo, 3ª persona, singular. Del verbo κατέχω, "sujetar".', analysis_morphologicus_zh: '動詞，現在時，直陳式，主動語態，第三人稱，單數。來自於動詞 κατέχω，「緊握」。', significationes: { es: 'sujeta' } },
+                        { id_verbi: 'v10_32', terminus: 'κοτυληδόνι', analysis_morphologicus: 'Sustantivo, dativo, femenino, singular. Del sustantivo κοτυληδών, "ventosa, cápulo".', analysis_morphologicus_zh: '名詞，與格，陰性，單數。來自名詞 κοτυληδών，「吸盤」。', significationes: { es: 'con una ventosa' } },
+                        { id_verbi: 'v10_33', terminus: 'κατὰ', analysis_morphologicus: 'Preposición.', analysis_morphologicus_zh: '介詞。', significationes: { es: 'en' } },
+                        { id_verbi: 'v10_34', terminus: 'τὸ', analysis_morphologicus: 'Artículo, neutro, singular.', analysis_morphologicus_zh: '冠詞，中性，單數。', significationes: { es: 'la' } },
+                        { id_verbi: 'v10_35', terminus: 'ἄκρον', analysis_morphologicus: 'Adjetivo, acusativo, neutro, singular. Del adjetivo ἄκρος, "extremo".', analysis_morphologicus_zh: '形容詞，賓格，中性，單數。來自形容詞 ἄκρος，「極端的」。', significationes: { es: 'punta' } },
+                        { id_verbi: 'v10_36', terminus: 'ἐοικυῖαν', analysis_morphologicus: 'Participio, perfecto, acusativo, femenino, singular. Del verbo ἔοικα, "ser semejante a".', analysis_morphologicus_zh: '分詞，完成時，賓格，陰性，單數。來自於動詞 ἔοικα，「相似於」。', significationes: { es: 'semejante a' } },
+                    ]
+                },
+                {
+                    id_orationis: 'o11',
+                    textus_latinus: "ἐκ δὲ αὐτῆς ὀδοὺς προκύπτει, ᾧ κεντοῦσα πίνει τοῦ αἵματος ‑ πίνει μὲν γὰρ καὶ γάλακτος, ἡδὺ δὲ αὐτῇ καὶ τὸ αἷμα ‑ οὐ μετὰ μεγάλης ὀδύνης τῶν κεντουμένων.",
+                    translationes: {
+                        es: '<strong>Traducción:</strong> Y de ella sale un diente, con el cual, picando, bebe de la sangre -pues bebe también de la leche, pero la sangre también es dulce para ella-, sin una gran molestia para los picados.',
+                        zh: '<strong>翻譯:</strong> 從它身上伸出一顆牙齒，用它刺入後吸食血液——因為牠也喝奶，但血液對牠來說同樣甘甜——對被刺者而言，並無太大痛苦。'
+                    },
+                    verba: [
+                        { id_verbi: 'v11_1', terminus: 'ἐκ', analysis_morphologicus: 'Preposición. "de".', analysis_morphologicus_zh: '介詞。「從」。', significationes: { es: 'de' } },
+                        { id_verbi: 'v11_2', terminus: 'δὲ', analysis_morphologicus: 'Conjunción adversativa.', analysis_morphologicus_zh: '反義連接詞。', significationes: { es: 'y' } },
+                        { id_verbi: 'v11_3', terminus: 'αὐτῆς', analysis_morphologicus: 'Pronombre, genitivo, femenino, singular.', analysis_morphologicus_zh: '代名詞，屬格，陰性，單數。', significationes: { es: 'ella' } },
+                        { id_verbi: 'v11_4', terminus: 'ὀδοὺς', analysis_morphologicus: 'Sustantivo, nominativo, masculino, singular. "diente".', analysis_morphologicus_zh: '名詞，主格，陽性，單數。「牙齒」。', significationes: { es: 'un diente' } },
+                        { id_verbi: 'v11_5', terminus: 'προκύπτει', analysis_morphologicus: 'Verbo, presente, indicativo, activo, 3ª persona, singular. Del verbo προκύπτω, "salir, sobresalir".', analysis_morphologicus_zh: '動詞，現在時，直陳式，主動語態，第三人稱，單數。來自於動詞 προκύπτω，「伸出」。', significationes: { es: 'sale' } },
+                        { id_verbi: 'v11_6', terminus: 'ᾧ', analysis_morphologicus: 'Pronombre relativo, dativo, neutro, singular. Del pronombre ὅς, "el cual".', analysis_morphologicus_zh: '關係代名詞，與格，中性，單數。來自 ὅς，「那個，哪個」。', significationes: { es: 'con el cual' } },
+                        { id_verbi: 'v11_7', terminus: 'κεντοῦσα', analysis_morphologicus: 'Participio, presente, nominativo, femenino, singular. Del verbo κεντέω, "picar".', analysis_morphologicus_zh: '分詞，現在時，主格，陰性，單數。來自於動詞 κεντέω，「刺入」。', significationes: { es: 'picando' } },
+                        { id_verbi: 'v11_8', terminus: 'πίνει', analysis_morphologicus: 'Verbo, presente, indicativo, activo, 3ª persona, singular. Del verbo πίνω, "beber".', analysis_morphologicus_zh: '動詞，現在時，直陳式，主動語態，第三人稱，單數。來自於動詞 πίνω，「喝」。', significationes: { es: 'bebe' } },
+                        { id_verbi: 'v11_9', terminus: 'τοῦ', analysis_morphologicus: 'Artículo, genitivo, neutro, singular.', analysis_morphologicus_zh: '冠詞，屬格，中性，單數。', significationes: { es: 'de la' } },
+                        { id_verbi: 'v11_10', terminus: 'αἵματος', analysis_morphologicus: 'Sustantivo, genitivo, neutro, singular. Del sustantivo αἷμα, "sangre".', analysis_morphologicus_zh: '名詞，屬格，中性，單數。來自名詞 αἷμα，「血液」。', significationes: { es: 'sangre' } },
+                        { id_verbi: 'v11_11', terminus: 'πίνει', analysis_morphologicus: 'Verbo, presente, indicativo, activo, 3ª persona, singular.', analysis_morphologicus_zh: '動詞，現在時，直陳式，主動語態，第三人稱，單數。', significationes: { es: 'bebe' } },
+                        { id_verbi: 'v11_12', terminus: 'μὲν', analysis_morphologicus: 'Partícula.', analysis_morphologicus_zh: '質詞。', significationes: { es: 'ciertamente' } },
+                        { id_verbi: 'v11_13', terminus: 'γὰρ', analysis_morphologicus: 'Partícula explicativa. "pues, porque".', analysis_morphologicus_zh: '解釋質詞。「因為」。', significationes: { es: 'pues' } },
+                        { id_verbi: 'v11_14', terminus: 'καὶ', analysis_morphologicus: 'Conjunción.', analysis_morphologicus_zh: '連接詞。', significationes: { es: 'y' } },
+                        { id_verbi: 'v11_15', terminus: 'γάλακτος', analysis_morphologicus: 'Sustantivo, genitivo, neutro, singular. Del sustantivo γάλα, "leche".', analysis_morphologicus_zh: '名詞，屬格，中性，單數。來自名詞 γάλα，「牛奶」。', significationes: { es: 'leche' } },
+                        { id_verbi: 'v11_16', terminus: 'ἡδὺ', analysis_morphologicus: 'Adjetivo, nominativo, neutro, singular. Del adjetivo ἡδύς, "dulce, agradable".', analysis_morphologicus_zh: '形容詞，主格，中性，單數。來自形容詞 ἡδύς，「甜美的，令人愉快的」。', significationes: { es: 'dulce' } },
+                        { id_verbi: 'v11_17', terminus: 'δὲ', analysis_morphologicus: 'Conjunción adversativa.', analysis_morphologicus_zh: '反義連接詞。', significationes: { es: 'pero' } },
+                        { id_verbi: 'v11_18', terminus: 'αὐτῇ', analysis_morphologicus: 'Pronombre, dativo, femenino, singular.', analysis_morphologicus_zh: '代名詞，與格，陰性，單數。', significationes: { es: 'para ella' } },
+                        { id_verbi: 'v11_19', terminus: 'καὶ', analysis_morphologicus: 'Conjunción.', analysis_morphologicus_zh: '連接詞。', significationes: { es: 'también' } },
+                        { id_verbi: 'v11_20', terminus: 'τὸ', analysis_morphologicus: 'Artículo, neutro, singular.', analysis_morphologicus_zh: '冠詞，中性，單數。', significationes: { es: 'la' } },
+                        { id_verbi: 'v11_21', terminus: 'αἷμα', analysis_morphologicus: 'Sustantivo, nominativo, neutro, singular. Del sustantivo αἷμα, "sangre".', analysis_morphologicus_zh: '名詞，主格，中性，單數。來自名詞 αἷμα，「血液」。', significationes: { es: 'sangre' } },
+                        { id_verbi: 'v11_22', terminus: 'οὐ', analysis_morphologicus: 'Adverbio de negación.', analysis_morphologicus_zh: '否定副詞。', significationes: { es: 'no' } },
+                        { id_verbi: 'v11_23', terminus: 'μετὰ', analysis_morphologicus: 'Preposición. "sin".', analysis_morphologicus_zh: '介詞。「沒有」。', significationes: { es: 'sin' } },
+                        { id_verbi: 'v11_24', terminus: 'μεγάλης', analysis_morphologicus: 'Adjetivo, genitivo, femenino, singular. Del adjetivo μέγας, "grande".', analysis_morphologicus_zh: '形容詞，屬格，陰性，單數。來自形容詞 μέγας，「大的」。', significationes: { es: 'gran' } },
+                        { id_verbi: 'v11_25', terminus: 'ὀδύνης', analysis_morphologicus: 'Sustantivo, genitivo, femenino, singular. Del sustantivo ὀδύνη, "dolor, molestia".', analysis_morphologicus_zh: '名詞，屬格，陰性，單數。來自名詞 ὀδύνη，「痛苦，不適」。', significationes: { es: 'molestia' } },
+                        { id_verbi: 'v11_26', terminus: 'τῶν', analysis_morphologicus: 'Artículo, genitivo, plural.', analysis_morphologicus_zh: '冠詞，屬格，複數。', significationes: { es: 'de los' } },
+                        { id_verbi: 'v11_27', terminus: 'κεντουμένων', analysis_morphologicus: 'Participio, presente, genitivo, medio, plural. Del verbo κεντέω, "ser picado".', analysis_morphologicus_zh: '分詞，現在時，屬格，中間語態，複數。來自於動詞 κεντέω，「被刺者」。', significationes: { es: 'los picados' } },
+                    ]
+                },
+                {
+                    id_orationis: 'o12',
+                    textus_latinus: "ἑξάπους δὲ οὖσα τοῖς μὲν τέσσαρσι βαδίζει μόνοις, τοῖς δὲ προσθίοις δυσὶ καὶ ὅσα χερσὶ χρῆται.",
+                    translationes: {
+                        es: '<strong>Traducción:</strong> Y, siendo de seis patas, camina solo con cuatro, y con las dos delanteras las usa como si fueran manos.',
+                        zh: '<strong>翻譯:</strong> 作為六足生物，牠只用四條腿行走，而用前兩條腿當作手來使用。'
+                    },
+                    verba: [
+                        { id_verbi: 'v12_1', terminus: 'ἑξάπους', analysis_morphologicus: 'Adjetivo, nominativo, femenino, singular. De ἑξάπους, "de seis patas".', analysis_morphologicus_zh: '形容詞，主格，陰性，單數。來自 ἑξάπους，「六足的」。', significationes: { es: 'de seis patas' } },
+                        { id_verbi: 'v12_2', terminus: 'δὲ', analysis_morphologicus: 'Conjunción adversativa.', analysis_morphologicus_zh: '反義連接詞。', significationes: { es: 'y' } },
+                        { id_verbi: 'v12_3', terminus: 'οὖσα', analysis_morphologicus: 'Participio, presente, nominativo, femenino, singular. Del verbo εἰμί, "ser".', analysis_morphologicus_zh: '分詞，現在時，主格，陰性，單數。來自於動詞 εἰμί，「是」。', significationes: { es: 'siendo' } },
+                        { id_verbi: 'v12_4', terminus: 'τοῖς', analysis_morphologicus: 'Artículo, dativo, plural.', analysis_morphologicus_zh: '冠詞，與格，複數。', significationes: { es: 'con las' } },
+                        { id_verbi: 'v12_5', terminus: 'μὲν', analysis_morphologicus: 'Partícula.', analysis_morphologicus_zh: '質詞。', significationes: { es: 'por un lado' } },
+                        { id_verbi: 'v12_6', terminus: 'τέσσαρσι', analysis_morphologicus: 'Numeral, dativo, plural. De τέσσαρες, "cuatro".', analysis_morphologicus_zh: '數詞，與格，複數。來自 τέσσαρες，「四」。', significationes: { es: 'cuatro' } },
+                        { id_verbi: 'v12_7', terminus: 'βαδίζει', analysis_morphologicus: 'Verbo, presente, indicativo, activo, 3ª persona, singular. Del verbo βαδίζω, "caminar".', analysis_morphologicus_zh: '動詞，現在時，直陳式，主動語態，第三人稱，單數。來自於動詞 βαδίζω，「行走」。', significationes: { es: 'camina' } },
+                        { id_verbi: 'v12_8', terminus: 'μόνοις', analysis_morphologicus: 'Adjetivo, dativo, masculino, plural. De μόνος, "solo".', analysis_morphologicus_zh: '形容詞，與格，陽性，複數。來自 μόνος，「單獨的」。', significationes: { es: 'solo' } },
+                        { id_verbi: 'v12_9', terminus: 'τοῖς', analysis_morphologicus: 'Artículo, dativo, plural.', analysis_morphologicus_zh: '冠詞，與格，複數。', significationes: { es: 'con las' } },
+                        { id_verbi: 'v12_10', terminus: 'δὲ', analysis_morphologicus: 'Partícula.', analysis_morphologicus_zh: '質詞。', significationes: { es: 'y por otro' } },
+                        { id_verbi: 'v12_11', terminus: 'προσθίοις', analysis_morphologicus: 'Adjetivo, dativo, masculino, plural. De πρόσθιος, "delantero".', analysis_morphologicus_zh: '形容詞，與格，陽性，複數。來自 πρόσθιος，「前面的」。', significationes: { es: 'delanteras' } },
+                        { id_verbi: 'v12_12', terminus: 'δυσὶ', analysis_morphologicus: 'Numeral, dativo, dual. De δύο, "dos".', analysis_morphologicus_zh: '數詞，與格，雙數。來自 δύο，「二」。', significationes: { es: 'dos' } },
+                        { id_verbi: 'v12_13', terminus: 'καὶ', analysis_morphologicus: 'Conjunción.', analysis_morphologicus_zh: '連接詞。', significationes: { es: 'y' } },
+                        { id_verbi: 'v12_14', terminus: 'ὅσα', analysis_morphologicus: 'Pronombre relativo, acusativo, neutro, plural. "como si".', analysis_morphologicus_zh: '關係代名詞，賓格，中性，複數。「像」。', significationes: { es: 'como si fueran' } },
+                        { id_verbi: 'v12_15', terminus: 'χερσὶ', analysis_morphologicus: 'Sustantivo, dativo, femenino, plural. Del sustantivo χείρ, "mano".', analysis_morphologicus_zh: '名詞，與格，陰性，複數。來自名詞 χείρ，「手」。', significationes: { es: 'manos' } },
+                        { id_verbi: 'v12_16', terminus: 'χρῆται', analysis_morphologicus: 'Verbo, presente, indicativo, medio, 3ª persona, singular. Del verbo χράομαι, "usar".', analysis_morphologicus_zh: '動詞，現在時，直陳式，中間語態，第三人稱，單數。來自於動詞 χράομαι，「使用」。', significationes: { es: 'usa' } },
+                    ]
+                },
+                {
+                    id_orationis: 'o13',
+                    textus_latinus: "ἴδοις ἂν οὖν αὐτὴν ἐπὶ τεττάρων βεβηκυῖαν ἔχουσάν τι ἐν τοῖν χεροῖν μετέωρον ἐδώδιμον, ἀνθρωπίνως πάνυ καὶ καθ' ἡμᾶς.",
+                    translationes: {
+                        es: '<strong>Traducción:</strong> Así, podrías verla de pie sobre cuatro patas, teniendo algo de comida suspendido en sus dos manos, de manera muy humana y como nosotros.',
+                        zh: '<strong>翻譯:</strong> 因此，你可以看到牠用四條腿站立，雙手懸空拿著食物，非常像人，就像我們一樣。'
+                    },
+                    verba: [
+                        { id_verbi: 'v13_1', terminus: 'ἴδοις', analysis_morphologicus: 'Verbo, aoristo, optativo, activo, 2ª persona, singular.', analysis_morphologicus_zh: '動詞，不定過去時，祈願式，主動語態，第二人稱，單數。', significationes: { es: 'podrías ver' } },
+                        { id_verbi: 'v13_2', terminus: 'ἂν', analysis_morphologicus: 'Partícula modal.', analysis_morphologicus_zh: '情態質詞。', significationes: { es: 'partícula' } },
+                        { id_verbi: 'v13_3', terminus: 'οὖν', analysis_morphologicus: 'Conjunción. "así, entonces".', analysis_morphologicus_zh: '連接詞。「因此，所以」。', significationes: { es: 'así' } },
+                        { id_verbi: 'v13_4', terminus: 'αὐτὴν', analysis_morphologicus: 'Pronombre, acusativo, femenino, singular. "a ella".', analysis_morphologicus_zh: '代名詞，賓格，陰性，單數。「她」。', significationes: { es: 'a ella' } },
+                        { id_verbi: 'v13_5', terminus: 'ἐπὶ', analysis_morphologicus: 'Preposición. "sobre".', analysis_morphologicus_zh: '介詞。「在...上」。', significationes: { es: 'sobre' } },
+                        { id_verbi: 'v13_6', terminus: 'τεττάρων', analysis_morphologicus: 'Numeral, genitivo, plural. De τέσσαρες, "cuatro".', analysis_morphologicus_zh: '數詞，屬格，複數。來自 τέσσαρες，「四」。', significationes: { es: 'cuatro' } },
+                        { id_verbi: 'v13_7', terminus: 'βεβηκυῖαν', analysis_morphologicus: 'Participio, perfecto, acusativo, femenino, singular. Del verbo βαίνω, "estar de pie".', analysis_morphologicus_zh: '分詞，完成時，賓格，陰性，單數。來自於動詞 βαίνω，「站立」。', significationes: { es: 'de pie' } },
+                        { id_verbi: 'v13_8', terminus: 'ἔχουσάν', analysis_morphologicus: 'Participio, presente, acusativo, femenino, singular. Del verbo ἔχω, "tener".', analysis_morphologicus_zh: '分詞，現在時，賓格，陰性，單數。來自於動詞 ἔχω，「拿著」。', significationes: { es: 'teniendo' } },
+                        { id_verbi: 'v13_9', terminus: 'τι', analysis_morphologicus: 'Pronombre indefinido, acusativo, neutro, singular. "algo".', analysis_morphologicus_zh: '不定代名詞，賓格，中性，單數。「某物」。', significationes: { es: 'algo' } },
+                        { id_verbi: 'v13_10', terminus: 'ἐν', analysis_morphologicus: 'Preposición. "en".', analysis_morphologicus_zh: '介詞。「在...」。', significationes: { es: 'en' } },
+                        { id_verbi: 'v13_11', terminus: 'τοῖν', analysis_morphologicus: 'Artículo, dativo, dual. De ὁ, ἡ, τό.', analysis_morphologicus_zh: '冠詞，與格，雙數。來自 ὁ, ἡ, τό。', significationes: { es: 'las dos' } },
+                        { id_verbi: 'v13_12', terminus: 'χεροῖν', analysis_morphologicus: 'Sustantivo, dativo, dual. Del sustantivo χείρ, "mano".', analysis_morphologicus_zh: '名詞，與格，雙數。來自名詞 χείρ，「手」。', significationes: { es: 'manos' } },
+                        { id_verbi: 'v13_13', terminus: 'μετέωρον', analysis_morphologicus: 'Adjetivo, acusativo, neutro, singular. De μετέωρος, "suspendido".', analysis_morphologicus_zh: '形容詞，賓格，中性，單數。來自 μετέωρος，「懸空的」。', significationes: { es: 'suspendido' } },
+                        { id_verbi: 'v13_14', terminus: 'ἐδώδιμον', analysis_morphologicus: 'Adjetivo, acusativo, neutro, singular. De ἐδώδιμος, "comestible, de comida".', analysis_morphologicus_zh: '形容詞，賓格，中性，單數。來自 ἐδώδιμος，「可食用的，食物」。', significationes: { es: 'comida' } },
+                        { id_verbi: 'v13_15', terminus: 'ἀνθρωπίνως', analysis_morphologicus: 'Adverbio. "de manera humana".', analysis_morphologicus_zh: '副詞。「像人一樣地」。', significationes: { es: 'muy humana' } },
+                        { id_verbi: 'v13_16', terminus: 'πάνυ', analysis_morphologicus: 'Adverbio. "muy".', analysis_morphologicus_zh: '副詞。「非常」。', significationes: { es: 'muy' } },
+                        { id_verbi: 'v13_17', terminus: 'καὶ', analysis_morphologicus: 'Conjunción.', analysis_morphologicus_zh: '連接詞。', significationes: { es: 'y' } },
+                        { id_verbi: 'v13_18', terminus: "καθ'", analysis_morphologicus: 'Preposición.', analysis_morphologicus_zh: '介詞。', significationes: { es: 'como' } },
+                        { id_verbi: 'v13_19', terminus: 'ἡμᾶς', analysis_morphologicus: 'Pronombre, acusativo, plural. "nosotros".', analysis_morphologicus_zh: '代名詞，賓格，複數。「我們」。', significationes: { es: 'nosotros' } },
+                    ]
+                }
+            ]
+        };
+
+        // =========================================================================================
+        // === ZONA DE LÓGICA INTERACTIVA ===
+        // === No es necesario modificar el código debajo de esta línea ===
+        // =========================================================================================
+        const paragrafusContentus = document.getElementById('paragrafus-contentus');
+        const marginaliaContentus = document.getElementById('marginalia-contentus');
+
+        let activumVerbum = null;
+        let activaOratio = null;
+
+        /**
+         * Renderiza el texto griego en el panel principal, envolviendo cada palabra con un span clickeable.
+         * Se ha refactorizado esta función para que sea más fiable con caracteres no latinos.
+         */
+        function reddeParagrafum() {
+            let allText = paragrafus.orationes.map(o => o.textus_latinus).join(' ');
+            let allVerba = paragrafus.orationes.flatMap(o => o.verba.map(v => ({...v, oratioId: o.id_orationis})));
+            
+            // Crea un mapa de palabras para una búsqueda más rápida
+            const verbaMap = new Map(allVerba.map(v => [v.terminus, v]));
+
+            // Expresión regular para tokenizar el texto, separando palabras de puntuación y espacios
+            const tokens = allText.split(/([,.·:;])|(\s+)/).filter(Boolean);
+            
+            let htmlContentus = '';
+            tokens.forEach(token => {
+                // Limpia el token de cualquier carácter no deseado que pudiera haberse colado
+                const cleanToken = token.trim();
+
+                // Si el token es un espacio o un token de puntuación, lo añade sin procesar
+                if (!cleanToken) {
+                    htmlContentus += token;
+                } else {
+                    const verbumData = verbaMap.get(cleanToken);
+                    if (verbumData) {
+                        htmlContentus += `<span class="verbum" data-verbum-id="${verbumData.id_verbi}" data-oratio-id="${verbumData.oratioId}">${cleanToken}</span>`;
+                    } else {
+                        htmlContentus += cleanToken;
+                    }
+                }
+            });
+
+            paragrafusContentus.innerHTML = htmlContentus;
+        }
+
+        /**
+         * Actualiza el contenido del panel lateral con el análisis de la palabra y la traducción de la frase.
+         */
+        function actualizaMarginalia() {
+            let htmlContentus = '';
+
+            // Sección de análisis morfológico
+            htmlContentus += `
+                <section id="analysis-morphologicus-section" class="mb-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">Análisis Morfológico / 形態分析</h3>`;
+            if (activumVerbum) {
+                htmlContentus += `
+                    <h4 class="text-2xl textum-classicum text-gray-800 mb-4">${activumVerbum.terminus}</h4>
+                    <div class="space-y-4">
+                        <div>
+                            <h5 class="font-bold text-sm uppercase text-gray-500 tracking-wider">Análisis (Español)</h5>
+                            <p class="text-gray-700 mt-1">${activumVerbum.analysis_morphologicus}</p>
+                            <p class="text-gray-700 mt-1"><strong>Significado:</strong> ${activumVerbum.significationes.es}</p>
+                        </div>
+                        <div>
+                            <h5 class="font-bold text-sm uppercase text-gray-500 tracking-wider mt-4">形態分析 (中文)</h5>
+                            <p class="text-gray-700 mt-1">${activumVerbum.analysis_morphologicus_zh}</p>
+                            <p class="text-gray-700 mt-1"><strong>意義:</strong> ${activumVerbum.significationes.zh || 'Traducción no disponible'}</p>
+                        </div>
+                    </div>`;
+            } else {
+                htmlContentus += `<div class="p-4 bg-stone-200 rounded-md text-gray-600"><p>Seleccione una palabra para ver su análisis.</p></div>`;
+            }
+            htmlContentus += `</section>`;
+
+            // Sección de traducción de la frase
+            if (activaOratio) {
+                htmlContentus += `
+                    <hr class="border-stone-300 my-6">
+                    <section id="analysis-orationis-section">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-4">Traducción de la Frase / 句子翻譯</h3>
+                        <div class="space-y-3">
+                             <p class="text-gray-800 textum-classicum bg-stone-200 p-3 rounded-md">${activaOratio.textus_latinus}</p>
+                             <div class="text-gray-700 mt-2">${activaOratio.translationes.es}</div>
+                             <div class="text-gray-700 mt-2">${activaOratio.translationes.zh}</div>
+                        </div>
+                    </section>`;
+            }
+
+            marginaliaContentus.innerHTML = htmlContentus;
+        }
+
+        /**
+         * Manejador de eventos para el clic en las palabras.
+         */
+        paragrafusContentus.addEventListener('click', (e) => {
+            const verbumTarget = e.target.closest('.verbum');
+
+            // Si se hace clic fuera de una palabra, deseleccionar
+            if (!verbumTarget) {
+                document.querySelectorAll('.activus').forEach(el => el.classList.remove('activus'));
+                activumVerbum = null;
+                activaOratio = null;
+                actualizaMarginalia();
+                return;
+            }
+
+            // Remover la clase 'activus' de cualquier palabra previamente seleccionada
+            document.querySelectorAll('.activus').forEach(el => el.classList.remove('activus'));
+
+            const verbumId = verbumTarget.dataset.verbumId;
+            const oratioId = verbumTarget.dataset.oratioId;
+
+            // Encontrar la oración y la palabra correspondientes
+            activaOratio = paragrafus.orationes.find(o => o.id_orationis === oratioId);
+            if (activaOratio) {
+                activumVerbum = activaOratio.verba.find(v => v.id_verbi === verbumId);
+            }
+
+            // Marcar la palabra seleccionada como activa
+            verbumTarget.classList.add('activus');
+
+            // Actualizar el panel lateral con la nueva información
+            actualizaMarginalia();
+        });
+
+        // Inicializar la interfaz al cargar la página
+        reddeParagrafum();
+        actualizaMarginalia();
+    });
+    </script>
+</body>
+</html>
