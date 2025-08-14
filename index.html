@@ -131,7 +131,13 @@
                 <button id="close-viewer-btn" class="px-4 py-2 bg-stone-200 hover:bg-stone-300 rounded-lg font-semibold text-stone-700 transition">Cerrar Visor</button>
             </div>
             <div id="iframe-wrapper">
-                </div>
+                
+            </div>
+            <div class="flex justify-end mt-4">
+                <button id="next-btn" class="px-4 py-2 bg-stone-200 hover:bg-stone-300 rounded-lg font-semibold text-stone-700 transition hidden">
+                    Siguiente <span aria-hidden="true">→</span>
+                </button>
+            </div>
         </div>
 
         <footer class="text-center mt-10 py-6">
@@ -142,37 +148,41 @@
 
     <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // Seleccionamos todos los elementos necesarios del DOM
         const contentLinks = document.querySelectorAll('.content-link');
         const contentViewer = document.getElementById('content-viewer');
         const iframeWrapper = document.getElementById('iframe-wrapper');
         const closeBtn = document.getElementById('close-viewer-btn');
+        const nextBtn = document.getElementById('next-btn');
+        let currentIndex = -1; // Para rastrear el índice del enlace actual
 
-        // Añadimos un evento a cada enlace de la lista
-        contentLinks.forEach(link => {
+        contentLinks.forEach((link, index) => {
             link.addEventListener('click', (event) => {
-                // Prevenimos la navegación normal
                 event.preventDefault();
                 const url = link.getAttribute('href');
-                
-                // Creamos un iframe y lo insertamos en su contenedor
-                // El título es importante para la accesibilidad
                 iframeWrapper.innerHTML = `<iframe src="${url}" title="Visor de contenido del texto seleccionado"></iframe>`;
-                
-                // Mostramos el contenedor del visor
                 contentViewer.classList.remove('hidden');
-
-                // Hacemos que la página se desplace suavemente hasta el visor
                 contentViewer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                currentIndex = index; // Actualizamos el índice actual
+
+                // Mostramos u ocultamos el botón "Siguiente" según corresponda
+                if (currentIndex < contentLinks.length - 1) {
+                    nextBtn.classList.remove('hidden');
+                    nextBtn.onclick = () => {
+                        contentLinks[++currentIndex].click(); // Simula un clic en el siguiente enlace
+                    };
+                } else {
+                    nextBtn.classList.add('hidden');
+                    nextBtn.onclick = null;
+                }
             });
         });
 
-        // Añadimos un evento al botón de cerrar
         closeBtn.addEventListener('click', () => {
-            // Ocultamos el visor
             contentViewer.classList.add('hidden');
-            // Vaciamos el contenido para detener cualquier proceso dentro del iframe
             iframeWrapper.innerHTML = '';
+            currentIndex = -1; // Resetear el índice al cerrar
+            nextBtn.classList.add('hidden');
+            nextBtn.onclick = null;
         });
     });
     </script>
